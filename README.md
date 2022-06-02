@@ -1,1 +1,1 @@
-# super-battle-chess
+# super-chess-battle
