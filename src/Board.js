@@ -1,7 +1,6 @@
 import React from 'react';
 import './styles.scss';
-import Rook from './Pieces';
-import Piece from './Pieces';
+import {Bishop, Rook, Piece} from './Pieces';
 
 export default class Board extends React.Component {
 
@@ -21,8 +20,8 @@ export default class Board extends React.Component {
                   [null, null, null, null, null, null, null, null, null, null],
                   [null, null, null, null, null, null, null, null, null, null],
                 ]
-    this.WHITE = 1;
-    this.BLACK = 0;
+    this.WHITE = true;
+    this.BLACK = false;
   }
 
   constructor(props) {
@@ -31,7 +30,11 @@ export default class Board extends React.Component {
     this.canvas = React.createRef();
     this.selected = null;
     this.canMoveTo = [];
-    this.turn = Board.WHITE;
+
+    this.state = {
+      playerColor: Board.WHITE,
+      turn: Board.WHITE,
+    }
   };
 
   drawBoard() {
@@ -69,6 +72,8 @@ export default class Board extends React.Component {
       for (var j = 0; j < Board.grid[i].length; j++) {
         if (Board.grid[j][i] instanceof Rook) {
           ctx.fillText("R", i * gridUnit, (j+1) * gridUnit);
+        } else if (Board.grid[j][i] instanceof Bishop) {
+          ctx.fillText("B", i * gridUnit, (j + 1) * gridUnit);
         }
       }
     }
@@ -80,8 +85,8 @@ export default class Board extends React.Component {
       this.handleClick(this.canvas.current, e)
     })
 
-    var rook = new Rook(Board.WHITE);
-    Board.grid[8][1] = rook;
+    Board.grid[8][1] = new Bishop(Board.WHITE);
+    Board.grid[1][1] = new Rook(Board.BLACK);
     console.log(Board.grid);
     this.drawBoard();
   }
@@ -91,7 +96,7 @@ export default class Board extends React.Component {
     var x = event.clientX - rect.left;
     var y = event.clientY - rect.top;
     var box = [Math.ceil(x / (canvas.width / 10)) - 1, Math.ceil(y / (canvas.height / 10)) - 1]
-    if (Board.grid[box[1]][box[0]] instanceof Piece && Board.grid[box[1]][box[0]].color == Board.WHITE) {
+    if (Board.grid[box[1]][box[0]] instanceof Piece && Board.grid[box[1]][box[0]].color == this.state.playerColor && this.state.turn == this.state.playerColor) {
       this.selected = box;
       this.canMoveTo = Board.grid[box[1]][box[0]].getMovement(box[0], box[1]);
     } else if (this.selected != null) {
@@ -101,6 +106,7 @@ export default class Board extends React.Component {
           Board.grid[this.selected[1]][this.selected[0]] = null;
           this.selected = null;
           this.canMoveTo = null;
+          this.setState({turn: !this.state.turn});
         }
       }
     }
@@ -111,6 +117,8 @@ export default class Board extends React.Component {
     return (
       <div>
         <canvas ref={this.canvas} className="game"></canvas>
+        <button onClick={() => this.setState({playerColor: Board.WHITE })}>white</button>
+        <button onClick={() => this.setState({ playerColor: Board.BLACK })}>black</button>
       </div>
     )
   }
