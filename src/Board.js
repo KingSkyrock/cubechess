@@ -1,6 +1,6 @@
 import React from 'react';
 import './styles.scss';
-import {Bishop, Pawn, Rook, Piece} from './Pieces';
+import {Knight, Queen, Bishop, Pawn, Rook, Piece, King} from './Pieces';
 
 export default class Board extends React.Component {
 
@@ -35,7 +35,7 @@ export default class Board extends React.Component {
       playerColor: Board.WHITE,
       turn: Board.WHITE,
       length: 700,
-      x: 150,
+      x: 250,
       y: 100,
     }
   };
@@ -43,42 +43,50 @@ export default class Board extends React.Component {
   drawBoard() {
     var canvas = this.canvas.current;
     var ctx = canvas.getContext('2d');
-    canvas.width = 1000;
-    canvas.height = 900;
     ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+    var rect = canvas.getBoundingClientRect();
+    var x = this.state.x;
+    var y = this.state.y;
+
     var gridUnit = this.state.length / 10;
 
-    for (var i = this.state.y; i < this.state.y + this.state.length + gridUnit; i += gridUnit) {
-      ctx.beginPath();
-      ctx.moveTo(this.state.x, i);
-      ctx.lineTo(this.state.x + this.state.length, i);
-      ctx.closePath();
-      ctx.stroke();
-      
+    ctx.beginPath();
+    for (var i = 0; i < 11; i++) {
+      ctx.moveTo(x, i * gridUnit + y);
+      ctx.lineTo(x + this.state.length, i * gridUnit + y);
     }
-    for (var i = this.state.x; i < this.state.x + this.state.length + gridUnit; i += gridUnit) {
-      ctx.beginPath();
-      ctx.moveTo(i, this.state.y);
-      ctx.lineTo(i, this.state.y + this.state.length);
-      ctx.closePath();
-      ctx.stroke();
+    for (var i = 0; i < 11; i++) {
+      ctx.moveTo(i * gridUnit + x, y);
+      ctx.lineTo(i * gridUnit + x, y + this.state.length);
     }
+
+    ctx.closePath();
+    ctx.stroke();
 
     for (var i in this.canMoveTo) {
       ctx.fillStyle = '#00ff00';
-      ctx.fillRect(this.canMoveTo[i][0] * gridUnit + this.state.x, this.canMoveTo[i][1] * gridUnit + this.state.y, gridUnit, gridUnit);
+      ctx.fillRect(this.canMoveTo[i][0] * gridUnit + x, this.canMoveTo[i][1] * gridUnit + y, gridUnit, gridUnit);
       ctx.fillStyle = '#000000';
     }
 
     ctx.font = Math.round(this.state.length/8)+"px Arial";
-    for (var i = 0; i < Board.grid.length; i++) {
+    for (var i = 0, boardX, boardY; i < Board.grid.length; i++) {
       for (var j = 0; j < Board.grid[i].length; j++) {
+        boardX = i * gridUnit + x;
+        boardY = (j + 1) * gridUnit + y;
         if (Board.grid[j][i] instanceof Rook) {
-          ctx.fillText("R", i * gridUnit + this.state.x, (j + 1) * gridUnit + this.state.y);
+          ctx.fillText("R", boardX, boardY);
         } else if (Board.grid[j][i] instanceof Bishop) {
-          ctx.fillText("B", i * gridUnit + this.state.x, (j + 1) * gridUnit + this.state.y);
+          ctx.fillText("B", boardX, boardY);
         } else if (Board.grid[j][i] instanceof Pawn) {
-          ctx.fillText("P", i * gridUnit + this.state.x, (j + 1) * gridUnit + this.state.y);
+          ctx.fillText("P", boardX, boardY);
+        } else if (Board.grid[j][i] instanceof Queen) {
+          ctx.fillText("Q", boardX, boardY);
+        } else if (Board.grid[j][i] instanceof Knight) {
+          ctx.fillText("K", boardX, boardY);
+        } else if (Board.grid[j][i] instanceof King) {
+          ctx.fillText("O", boardX, boardY);
         }
       }
     }
@@ -86,21 +94,35 @@ export default class Board extends React.Component {
 
   componentDidMount() {
 
-    this.canvas.current.addEventListener('mousedown', (e) => {
-      this.handleClick(this.canvas.current, e)
-    })
-
-    Board.grid[8][1] = new Pawn(Board.WHITE);
     Board.grid[1][1] = new Rook(Board.BLACK);
-    console.log(Board.grid);
+    Board.grid[1][2] = new Knight(Board.BLACK);
+    Board.grid[1][3] = new Bishop(Board.BLACK);
+    Board.grid[1][4] = new Queen(Board.BLACK);
+    Board.grid[1][6] = new Bishop(Board.BLACK);
+    Board.grid[1][7] = new Knight(Board.BLACK);
+    Board.grid[1][8] = new Rook(Board.BLACK);
+
+    Board.grid[8][1] = new Rook(Board.WHITE);
+    Board.grid[8][2] = new Knight(Board.WHITE);
+    Board.grid[8][3] = new Bishop(Board.WHITE);
+    Board.grid[8][4] = new Queen(Board.WHITE);
+    Board.grid[8][5] = new King(Board.WHITE);
+    Board.grid[8][6] = new Bishop(Board.WHITE);
+    Board.grid[8][7] = new Knight(Board.WHITE);
+    Board.grid[8][8] = new Rook(Board.WHITE);
+
+    for (var i = 0; i < 8; i++) {
+      Board.grid[7][i + 1] = new Pawn(Board.WHITE);
+      Board.grid[2][i + 1] = new Pawn(Board.BLACK);
+    }
+
     this.drawBoard();
   }
 
   handleClick(canvas, event) {
-    var rect = canvas.getBoundingClientRect();
-    var x = event.clientX - rect.left;
-    var y = event.clientY - rect.top;
-    var box = [Math.ceil((x - this.state.x) / (this.state.length / 10)), Math.ceil((y - this.state.y) / (this.state.length / 10))]
+    var x = (event.pageX - canvas.offsetLeft);
+    var y = (event.pageY - canvas.offsetTop);
+    var box = [Math.floor((x - this.state.x) / (this.state.length / 10)), Math.floor((y - this.state.y) / (this.state.length / 10))]
     if (x > this.state.x && x < this.state.x + this.state.length && y > this.state.y && y < this.state.y + this.state.length) {
       if (Board.grid[box[1]][box[0]] instanceof Piece && Board.grid[box[1]][box[0]].color == this.state.playerColor && this.state.turn == this.state.playerColor) {
         this.selected = box;
@@ -128,7 +150,7 @@ export default class Board extends React.Component {
   render() {
     return (
       <div>
-        <canvas ref={this.canvas} className="game"></canvas>
+        <canvas width="1000" height="900" onMouseDown={(e) => this.handleClick(this.canvas.current, e)} ref={this.canvas} className="game"></canvas>
         <button onClick={() => this.setState({playerColor: Board.WHITE })}>white</button>
         <button onClick={() => this.setState({ playerColor: Board.BLACK })}>black</button>
       </div>
