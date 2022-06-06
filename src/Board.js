@@ -9,6 +9,7 @@ export default class Board extends React.Component {
   static BLACK;
 
   static {
+
     this.grid = [ [null, null, null, null, null, null, null, null, null, null], 
                   [null, null, null, null, null, null, null, null, null, null],
                   [null, null, null, null, null, null, null, null, null, null],
@@ -30,6 +31,8 @@ export default class Board extends React.Component {
     this.canvas = React.createRef();
     this.selected = null;
     this.canMoveTo = [];
+    this.red = [];
+    this.colorInCheck = null;
 
     this.state = {
       playerColor: Board.WHITE,
@@ -40,12 +43,31 @@ export default class Board extends React.Component {
     }
   };
 
+  static getAllAttacking(color, grid) {
+    var allAttacking = [];
+    for (var i = 0; i < grid.length; i++) {
+      for (var j = 0; j < grid[i].length; j++) {
+        if (grid[i][j] instanceof Piece && grid[i][j].color == color) {
+          if (grid[i][j] instanceof Pawn) {
+            for (var coord of grid[i][j].getAttacking(j, i)) {
+              allAttacking.push(coord);
+            }
+          } else {
+            for (var coord of grid[i][j].getMovement(j, i, grid)) {
+              allAttacking.push(coord);
+            }
+          }
+        }
+      }
+    }
+    return allAttacking;
+  }
+
   drawBoard() {
     var canvas = this.canvas.current;
     var ctx = canvas.getContext('2d');
     ctx.clearRect(0, 0, canvas.width, canvas.height);
 
-    var rect = canvas.getBoundingClientRect();
     var x = this.state.x;
     var y = this.state.y;
 
@@ -67,6 +89,12 @@ export default class Board extends React.Component {
     for (var i in this.canMoveTo) {
       ctx.fillStyle = '#00ff00';
       ctx.fillRect(this.canMoveTo[i][0] * gridUnit + x, this.canMoveTo[i][1] * gridUnit + y, gridUnit, gridUnit);
+      ctx.fillStyle = '#000000';
+    }
+
+    for (var i in this.red) {
+      ctx.fillStyle = '#ff0000';
+      ctx.fillRect(this.red[i][0] * gridUnit + x, this.red[i][1] * gridUnit + y, gridUnit, gridUnit);
       ctx.fillStyle = '#000000';
     }
 
@@ -98,6 +126,7 @@ export default class Board extends React.Component {
     Board.grid[1][2] = new Knight(Board.BLACK);
     Board.grid[1][3] = new Bishop(Board.BLACK);
     Board.grid[1][4] = new Queen(Board.BLACK);
+    Board.grid[8][5] = new King(Board.BLACK);
     Board.grid[1][6] = new Bishop(Board.BLACK);
     Board.grid[1][7] = new Knight(Board.BLACK);
     Board.grid[1][8] = new Rook(Board.BLACK);
@@ -119,6 +148,15 @@ export default class Board extends React.Component {
     this.drawBoard();
   }
 
+  isBoardStateInCheck(color, grid) {
+    for (var x of Board.getAllAttacking(!color, grid)) {
+      if (grid[x[1]][x[0]] instanceof King && grid[x[1]][x[0]].color == color) {
+        return true;
+      }
+    }
+    return false;
+  }
+
   handleClick(canvas, event) {
     var x = (event.pageX - canvas.offsetLeft);
     var y = (event.pageY - canvas.offsetTop);
@@ -126,7 +164,17 @@ export default class Board extends React.Component {
     if (x > this.state.x && x < this.state.x + this.state.length && y > this.state.y && y < this.state.y + this.state.length) {
       if (Board.grid[box[1]][box[0]] instanceof Piece && Board.grid[box[1]][box[0]].color == this.state.playerColor && this.state.turn == this.state.playerColor) {
         this.selected = box;
-        this.canMoveTo = Board.grid[box[1]][box[0]].getMovement(box[0], box[1]);
+        this.canMoveTo = Board.grid[box[1]][box[0]].getMovement(box[0], box[1], Board.grid);
+        for (var i = this.canMoveTo.length - 1; i >= 0; i--) {
+          var newArray = Board.grid.map((arr) => {
+            return arr.slice();
+          });
+          newArray[this.canMoveTo[i][1]][this.canMoveTo[i][0]] = newArray[this.selected[1]][this.selected[0]];
+          newArray[this.selected[1]][this.selected[0]] = null;
+          if (this.isBoardStateInCheck(this.state.turn, newArray)) {
+            this.canMoveTo.splice(i, 1);
+          }
+        }
       } else if (this.selected != null) {
         for (var i of this.canMoveTo) {
           if (i[0] == box[0] && i[1] == box[1]) {
