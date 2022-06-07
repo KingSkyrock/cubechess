@@ -62,6 +62,7 @@ export default class Board extends React.Component {
 
     var gridUnit = this.state.length / 10;
 
+    /*
     ctx.beginPath();
     for (var i = 0; i < 11; i++) {
       ctx.moveTo(x, i * gridUnit + y);
@@ -73,25 +74,35 @@ export default class Board extends React.Component {
     }
 
     ctx.closePath();
-    ctx.stroke();
-
-    for (var i in this.canMoveTo) {
-      ctx.fillStyle = '#00ff00';
-      ctx.fillRect(this.canMoveTo[i][0] * gridUnit + x, this.canMoveTo[i][1] * gridUnit + y, gridUnit, gridUnit);
-      ctx.fillStyle = '#000000';
-    }
-
-    for (var i in this.red) {
-      ctx.fillStyle = '#ff0000';
-      ctx.fillRect(this.red[i][0] * gridUnit + x, this.red[i][1] * gridUnit + y, gridUnit, gridUnit);
-      ctx.fillStyle = '#000000';
-    }
+    ctx.stroke();*/
 
     ctx.font = Math.round(this.state.length/8)+"px Arial";
     for (var i = 0, boardX, boardY; i < this.grid.length; i++) {
       for (var j = 0; j < this.grid[i].length; j++) {
         boardX = i * gridUnit + x;
         boardY = (j + 1) * gridUnit + y;
+
+        if (i % 2) {
+          if (j % 2) {
+            ctx.fillStyle = "#6f6a52";
+          } else {
+            ctx.fillStyle = "#baa48a";
+          }
+        } else {
+          if (j % 2) {
+            ctx.fillStyle = "#baa48a";
+          } else {
+            ctx.fillStyle = "#6f6a52";
+          }
+        }
+        ctx.fillRect(boardX, j * gridUnit + y, gridUnit, gridUnit);
+
+        if (this.grid[j][i] instanceof Piece && this.grid[j][i].color == Board.WHITE) {
+          ctx.fillStyle = "#FFFFFF";
+        } else {
+          ctx.fillStyle = "#000000";
+        }
+
         if (this.grid[j][i] instanceof Rook) {
           ctx.fillText("R", boardX, boardY);
         } else if (this.grid[j][i] instanceof Bishop) {
@@ -106,6 +117,11 @@ export default class Board extends React.Component {
           ctx.fillText("O", boardX, boardY);
         }
       }
+    }
+    for (var i in this.canMoveTo) {
+      ctx.fillStyle = '#00ff00';
+      ctx.fillRect(this.canMoveTo[i][0] * gridUnit + x, this.canMoveTo[i][1] * gridUnit + y, gridUnit, gridUnit);
+      ctx.fillStyle = '#000000';
     }
   }
 
@@ -201,6 +217,19 @@ export default class Board extends React.Component {
             this.canMoveTo = null;
             this.setState({ turn: !this.state.turn }, () => {
               this.calculateMovable(this.state.turn);
+              var total = 0;
+              for (var j of this.canMoveToGrid) {
+                for (var k of j) {
+                  if (k != null) {
+                    total += k.length;
+                  }
+                }
+              }
+              if (total == 0 && this.isBoardStateInCheck(this.state.turn, this.grid)) {
+                alert("Checkmate: " + (this.state.turn == Board.WHITE ? "White" : "Black") + " wins!");
+              } else if (total == 0) {
+                alert("Stalemate!");
+              }
             });
           }
         }
