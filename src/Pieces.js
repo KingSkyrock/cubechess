@@ -13,33 +13,53 @@ export class Rook extends Piece {
 
   getMovement(x, y, grid) {
     var moveableCoords = [];
-    var i = y;
-    while (i - 1 >= 0 && !grid[i - 1][x]) { //up
+    for (var i = y; true;) { //up
       i--;
-      moveableCoords.push([x, i])
-      if (i - 1 >= 0 && grid[i - 1][x] instanceof Piece && grid[i - 1][x].color != this.color)
-        moveableCoords.push([x, i - 1]) 
+      if (i >= 0) {
+        if (grid[i][x] instanceof Piece && grid[i][x].color != this.color) {
+          moveableCoords.push([x, i])
+          break;
+        } else if (grid[i][x]) break;
+        moveableCoords.push([x, i])
+      } else {
+        break;
+      }
     }
-    i = y;
-    while (i + 1 <= 9 && !grid[i + 1][x]) { //down
+    for (var i = y; true;) { //down
       i++;
-      moveableCoords.push([x, i])
-      if (i + 1 <= 9 && grid[i + 1][x] instanceof Piece && grid[i + 1][x].color != this.color)
-        moveableCoords.push([x, i + 1]) 
+      if (i <= 9) {
+        if (grid[i][x] instanceof Piece && grid[i][x].color != this.color) {
+          moveableCoords.push([x, i])
+          break;
+        } else if (grid[i][x]) break;
+        moveableCoords.push([x, i])
+      } else {
+        break;
+      }
     }
-    i = x;
-    while (i - 1 >= 0 && !grid[y][i - 1]) { //left
+    for (var i = x; true;) { //right
+      i++;
+      if (i <= 9) {
+        if (grid[y][i] instanceof Piece && grid[y][i].color != this.color) {
+          moveableCoords.push([i, y])
+          break;
+        } else if (grid[y][i]) break;
+        moveableCoords.push([i, y])
+      } else {
+        break;
+      }
+    }
+    for (var i = x; true;) { //right
       i--;
-      moveableCoords.push([i, y])
-      if (i - 1 >= 0 && grid[y][i - 1] instanceof Piece && grid[y][i - 1].color != this.color)
-        moveableCoords.push([i - 1, y])
-    }
-    i = x;
-    while (i + 1 <= 9 && !grid[y][i + 1]) { //right
-      i++;
-      moveableCoords.push([i, y])
-      if (i + 1 <= 9 && grid[y][i + 1] instanceof Piece && grid[y][i + 1].color != this.color)
-        moveableCoords.push([i + 1, y])
+      if (i >= 0) {
+        if (grid[y][i] instanceof Piece && grid[y][i].color != this.color) {
+          moveableCoords.push([i, y])
+          break;
+        } else if (grid[y][i]) break;
+        moveableCoords.push([i, y])
+      } else {
+        break;
+      }
     }
 
     return moveableCoords;
@@ -52,41 +72,53 @@ export class Bishop extends Piece {
   }
   getMovement(x, y, grid) {
     var moveableCoords = [];
-    var i = y;
-    var j = x;
-    while (i - 1 >= 0 && j - 1 >= 0 && !grid[i - 1][j - 1]) { //up left
-      i--;
-      j--;
-      moveableCoords.push([j, i])
-      if (i - 1 >= 0 && j - 1 >= 0 && grid[i - 1][j - 1] instanceof Piece && grid[i - 1][j - 1].color != this.color)
-        moveableCoords.push([j - 1, i - 1])
+    for (var i = y, j = x; true;) { //up left
+      i--; j--;
+      if (i >= 0 && j >= 0) {
+        if (grid[i][j] instanceof Piece && grid[i][j].color != this.color) {
+          moveableCoords.push([j, i])
+          break;
+        } else if (grid[i][j]) break;
+        moveableCoords.push([j, i])
+      } else {
+        break;
+      }
     }
-    i = y;
-    j = x;
-    while (i + 1 <= 9 && j - 1 >= 0 && !grid[i + 1][j - 1]) { //down left
-      i++;
-      j--;
-      moveableCoords.push([j, i])
-      if (i + 1 <= 9 && j - 1 >= 0 && grid[i + 1][j - 1] instanceof Piece && grid[i + 1][j - 1].color != this.color)
-        moveableCoords.push([j - 1, i + 1])
+    for (var i = y, j = x; true;) { //down left
+      i++; j--;
+      if (i <= 9 && j >= 0) {
+        if (grid[i][j] instanceof Piece && grid[i][j].color != this.color) {
+          moveableCoords.push([j, i])
+          break;
+        } else if (grid[i][j]) break;
+        moveableCoords.push([j, i])
+      } else {
+        break;
+      }
     }
-    i = y;
-    j = x;
-    while (i - 1 >= 0 && j + 1 <= 9 && !grid[i - 1][j + 1]) { //up right
-      i--;
-      j++;
-      moveableCoords.push([j, i])
-      if (i - 1 >= 0 && j + 1 <= 9 && grid[i - 1][j + 1] instanceof Piece && grid[i - 1][j + 1].color != this.color)
-        moveableCoords.push([j + 1, i - 1])
+    for (var i = y, j = x; true;) { //up right
+      i--; j++;
+      if (i >= 0 && j <= 9) {
+        if (grid[i][j] instanceof Piece && grid[i][j].color != this.color) {
+          moveableCoords.push([j, i])
+          break;
+        } else if (grid[i][j]) break;
+        moveableCoords.push([j, i])
+      } else {
+        break;
+      }
     }
-    i = y;
-    j = x;
-    while (i + 1 <= 9 && j + 1 <= 9 && !grid[i + 1][j + 1]) { //down right
-      i++;
-      j++;
-      moveableCoords.push([j, i])
-      if (i + 1 <= 9 && j + 1 <= 9 && grid[i + 1][j + 1] instanceof Piece && grid[i + 1][j + 1].color != this.color)
-        moveableCoords.push([j + 1, i + 1])
+    for (var i = y, j = x; true;) { //down right
+      i++; j++;
+      if (i <= 9 && j <= 9) {
+        if (grid[i][j] instanceof Piece && grid[i][j].color != this.color) {
+          moveableCoords.push([j, i])
+          break;
+        } else if (grid[i][j]) break;
+        moveableCoords.push([j, i])
+      } else {
+        break;
+      }
     }
 
     return moveableCoords;
@@ -159,73 +191,101 @@ export class Queen extends Piece {
 
   getMovement(x, y, grid) {
     var moveableCoords = [];
-
-    //bishop movement
-    var i = y;
-    var j = x;
-    while (i - 1 >= 0 && j - 1 >= 0 && !grid[i - 1][j - 1]) { //up left
+    for (var i = y; true;) { //up
       i--;
-      j--;
-      moveableCoords.push([j, i])
-      if (i - 1 >= 0 && j - 1 >= 0 && grid[i - 1][j - 1] instanceof Piece && grid[i - 1][j - 1].color != this.color)
-        moveableCoords.push([j - 1, i - 1])
+      if (i >= 0) {
+        if (grid[i][x] instanceof Piece && grid[i][x].color != this.color) {
+          moveableCoords.push([x, i])
+          break;
+        } else if (grid[i][x]) break;
+        moveableCoords.push([x, i])
+      } else {
+        break;
+      }
     }
-    i = y;
-    j = x;
-    while (i + 1 <= 9 && j - 1 >= 0 && !grid[i + 1][j - 1]) { //down left
+    for (var i = y; true;) { //down
       i++;
-      j--;
-      moveableCoords.push([j, i])
-      if (i + 1 <= 9 && j - 1 >= 0 && grid[i + 1][j - 1] instanceof Piece && grid[i + 1][j - 1].color != this.color)
-        moveableCoords.push([j - 1, i + 1])
+      if (i <= 9) {
+        if (grid[i][x] instanceof Piece && grid[i][x].color != this.color) {
+          moveableCoords.push([x, i])
+          break;
+        } else if (grid[i][x]) break;
+        moveableCoords.push([x, i])
+      } else {
+        break;
+      }
     }
-    i = y;
-    j = x;
-    while (i - 1 >= 0 && j + 1 <= 9 && !grid[i - 1][j + 1]) { //up right
+    for (var i = x; true;) { //right
+      i++;
+      if (i <= 9) {
+        if (grid[y][i] instanceof Piece && grid[y][i].color != this.color) {
+          moveableCoords.push([i, y])
+          break;
+        } else if (grid[y][i]) break;
+        moveableCoords.push([i, y])
+      } else {
+        break;
+      }
+    }
+    for (var i = x; true;) { //right
       i--;
-      j++;
-      moveableCoords.push([j, i])
-      if (i - 1 >= 0 && j + 1 <= 9 && grid[i - 1][j + 1] instanceof Piece && grid[i - 1][j + 1].color != this.color)
-        moveableCoords.push([j + 1, i - 1])
+      if (i >= 0) {
+        if (grid[y][i] instanceof Piece && grid[y][i].color != this.color) {
+          moveableCoords.push([i, y])
+          break;
+        } else if (grid[y][i]) break;
+        moveableCoords.push([i, y])
+      } else {
+        break;
+      }
     }
-    i = y;
-    j = x;
-    while (i + 1 <= 9 && j + 1 <= 9 && !grid[i + 1][j + 1]) { //down right
-      i++;
-      j++;
-      moveableCoords.push([j, i])
-      if (i + 1 <= 9 && j + 1 <= 9 && grid[i + 1][j + 1] instanceof Piece && grid[i + 1][j + 1].color != this.color)
-        moveableCoords.push([j + 1, i + 1])
+    for (var i = y, j = x; true;) { //up left
+      i--; j--;
+      if (i >= 0 && j >= 0) {
+        if (grid[i][j] instanceof Piece && grid[i][j].color != this.color) {
+          moveableCoords.push([j, i])
+          break;
+        } else if (grid[i][j]) break;
+        moveableCoords.push([j, i])
+      } else {
+        break;
+      }
     }
-
-    //rook movement
-    i = y;
-    while (i - 1 >= 0 && !grid[i - 1][x]) { //up
-      i--;
-      moveableCoords.push([x, i])
-      if (i - 1 >= 0 && grid[i - 1][x] instanceof Piece && grid[i - 1][x].color != this.color)
-        moveableCoords.push([x, i - 1])
+    for (var i = y, j = x; true;) { //down left
+      i++; j--;
+      if (i <= 9 && j >= 0) {
+        if (grid[i][j] instanceof Piece && grid[i][j].color != this.color) {
+          moveableCoords.push([j, i])
+          break;
+        } else if (grid[i][j]) break;
+        moveableCoords.push([j, i])
+      } else {
+        break;
+      }
     }
-    i = y;
-    while (i + 1 <= 9 && !grid[i + 1][x]) { //down
-      i++;
-      moveableCoords.push([x, i])
-      if (i + 1 <= 9 && grid[i + 1][x] instanceof Piece && grid[i + 1][x].color != this.color)
-        moveableCoords.push([x, i + 1])
+    for (var i = y, j = x; true;) { //up right
+      i--; j++;
+      if (i >= 0 && j <= 9) {
+        if (grid[i][j] instanceof Piece && grid[i][j].color != this.color) {
+          moveableCoords.push([j, i])
+          break;
+        } else if (grid[i][j]) break;
+        moveableCoords.push([j, i])
+      } else {
+        break;
+      }
     }
-    i = x;
-    while (i - 1 >= 0 && !grid[y][i - 1]) { //left
-      i--;
-      moveableCoords.push([i, y])
-      if (i - 1 >= 0 && grid[y][i - 1] instanceof Piece && grid[y][i - 1].color != this.color)
-        moveableCoords.push([i - 1, y])
-    }
-    i = x;
-    while (i + 1 <= 9 && !grid[y][i + 1]) { //right
-      i++;
-      moveableCoords.push([i, y])
-      if (i + 1 <= 9 && grid[y][i + 1] instanceof Piece && grid[y][i + 1].color != this.color)
-        moveableCoords.push([i + 1, y])
+    for (var i = y, j = x; true;) { //down right
+      i++; j++;
+      if (i <= 9 && j <= 9) {
+        if (grid[i][j] instanceof Piece && grid[i][j].color != this.color) {
+          moveableCoords.push([j, i])
+          break;
+        } else if (grid[i][j]) break;
+        moveableCoords.push([j, i])
+      } else {
+        break;
+      }
     }
 
     return moveableCoords;

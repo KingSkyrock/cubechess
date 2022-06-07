@@ -4,23 +4,10 @@ import {Knight, Queen, Bishop, Pawn, Rook, Piece, King} from './Pieces';
 
 export default class Board extends React.Component {
 
-  static grid;
   static WHITE;
   static BLACK;
 
   static {
-
-    this.grid = [ [null, null, null, null, null, null, null, null, null, null], 
-                  [null, null, null, null, null, null, null, null, null, null],
-                  [null, null, null, null, null, null, null, null, null, null],
-                  [null, null, null, null, null, null, null, null, null, null],
-                  [null, null, null, null, null, null, null, null, null, null],
-                  [null, null, null, null, null, null, null, null, null, null],
-                  [null, null, null, null, null, null, null, null, null, null],
-                  [null, null, null, null, null, null, null, null, null, null],
-                  [null, null, null, null, null, null, null, null, null, null],
-                  [null, null, null, null, null, null, null, null, null, null],
-                ]
     this.WHITE = true;
     this.BLACK = false;
   }
@@ -31,6 +18,8 @@ export default class Board extends React.Component {
     this.canvas = React.createRef();
     this.selected = null;
     this.canMoveTo = [];
+    this.canMoveToGrid;
+    this.grid;
     this.red = [];
     this.colorInCheck = null;
 
@@ -99,21 +88,21 @@ export default class Board extends React.Component {
     }
 
     ctx.font = Math.round(this.state.length/8)+"px Arial";
-    for (var i = 0, boardX, boardY; i < Board.grid.length; i++) {
-      for (var j = 0; j < Board.grid[i].length; j++) {
+    for (var i = 0, boardX, boardY; i < this.grid.length; i++) {
+      for (var j = 0; j < this.grid[i].length; j++) {
         boardX = i * gridUnit + x;
         boardY = (j + 1) * gridUnit + y;
-        if (Board.grid[j][i] instanceof Rook) {
+        if (this.grid[j][i] instanceof Rook) {
           ctx.fillText("R", boardX, boardY);
-        } else if (Board.grid[j][i] instanceof Bishop) {
+        } else if (this.grid[j][i] instanceof Bishop) {
           ctx.fillText("B", boardX, boardY);
-        } else if (Board.grid[j][i] instanceof Pawn) {
+        } else if (this.grid[j][i] instanceof Pawn) {
           ctx.fillText("P", boardX, boardY);
-        } else if (Board.grid[j][i] instanceof Queen) {
+        } else if (this.grid[j][i] instanceof Queen) {
           ctx.fillText("Q", boardX, boardY);
-        } else if (Board.grid[j][i] instanceof Knight) {
+        } else if (this.grid[j][i] instanceof Knight) {
           ctx.fillText("K", boardX, boardY);
-        } else if (Board.grid[j][i] instanceof King) {
+        } else if (this.grid[j][i] instanceof King) {
           ctx.fillText("O", boardX, boardY);
         }
       }
@@ -121,30 +110,40 @@ export default class Board extends React.Component {
   }
 
   componentDidMount() {
-
-    Board.grid[1][1] = new Rook(Board.BLACK);
-    Board.grid[1][2] = new Knight(Board.BLACK);
-    Board.grid[1][3] = new Bishop(Board.BLACK);
-    Board.grid[1][4] = new Queen(Board.BLACK);
-    Board.grid[8][5] = new King(Board.BLACK);
-    Board.grid[1][6] = new Bishop(Board.BLACK);
-    Board.grid[1][7] = new Knight(Board.BLACK);
-    Board.grid[1][8] = new Rook(Board.BLACK);
-
-    Board.grid[8][1] = new Rook(Board.WHITE);
-    Board.grid[8][2] = new Knight(Board.WHITE);
-    Board.grid[8][3] = new Bishop(Board.WHITE);
-    Board.grid[8][4] = new Queen(Board.WHITE);
-    Board.grid[8][5] = new King(Board.WHITE);
-    Board.grid[8][6] = new Bishop(Board.WHITE);
-    Board.grid[8][7] = new Knight(Board.WHITE);
-    Board.grid[8][8] = new Rook(Board.WHITE);
-
-    for (var i = 0; i < 8; i++) {
-      Board.grid[7][i + 1] = new Pawn(Board.WHITE);
-      Board.grid[2][i + 1] = new Pawn(Board.BLACK);
+    this.grid = [];
+    for (var i = 0; i < 10; i++) {
+      this.grid.push([null, null, null, null, null, null, null, null, null, null]);
     }
 
+    this.canMoveToGrid = [];
+    for (var i = 0; i < 10; i++) {
+      this.canMoveToGrid.push([null, null, null, null, null, null, null, null, null, null]);
+    }
+
+    this.grid[1][1] = new Rook(Board.BLACK);
+    this.grid[1][2] = new Knight(Board.BLACK);
+    this.grid[1][3] = new Bishop(Board.BLACK);
+    this.grid[1][4] = new Queen(Board.BLACK);
+    this.grid[1][5] = new King(Board.BLACK);
+    this.grid[1][6] = new Bishop(Board.BLACK);
+    this.grid[1][7] = new Knight(Board.BLACK);
+    this.grid[1][8] = new Rook(Board.BLACK);
+
+    this.grid[8][1] = new Rook(Board.WHITE);
+    this.grid[8][2] = new Knight(Board.WHITE);
+    this.grid[8][3] = new Bishop(Board.WHITE);
+    this.grid[8][4] = new Queen(Board.WHITE);
+    this.grid[8][5] = new King(Board.WHITE);
+    this.grid[8][6] = new Bishop(Board.WHITE);
+    this.grid[8][7] = new Knight(Board.WHITE);
+    this.grid[8][8] = new Rook(Board.WHITE);
+
+    for (var i = 0; i < 8; i++) {
+      this.grid[7][i + 1] = new Pawn(Board.WHITE);
+      this.grid[2][i + 1] = new Pawn(Board.BLACK);
+    }
+
+    this.calculateMovable(Board.WHITE);
     this.drawBoard();
   }
 
@@ -157,35 +156,52 @@ export default class Board extends React.Component {
     return false;
   }
 
+  calculateMovable(color) {
+    this.canMoveToGrid = [];
+    for (var i = 0; i < 10; i++) {
+      this.canMoveToGrid.push([null, null, null, null, null, null, null, null, null, null])
+    }
+    for (var i = 0; i < this.grid.length; i++) {
+      for (var j = 0; j < this.grid[i].length; j++) {
+        if (this.grid[i][j] instanceof Piece && this.grid[i][j].color == color) {
+          var canMoveTo = this.grid[i][j].getMovement(j, i, this.grid);
+          for (var k = canMoveTo.length - 1; k >= 0; k--) {
+            var newArray = this.grid.map((arr) => {
+              return arr.slice();
+            });
+            newArray[canMoveTo[k][1]][canMoveTo[k][0]] = newArray[i][j];
+            newArray[i][j] = null;
+            if (this.isBoardStateInCheck(color, newArray)) {
+              canMoveTo.splice(k, 1);
+            }
+          }
+          this.canMoveToGrid[i][j] = canMoveTo;
+        }
+      }
+    }
+  }
+
   handleClick(canvas, event) {
     var x = (event.pageX - canvas.offsetLeft);
     var y = (event.pageY - canvas.offsetTop);
     var box = [Math.floor((x - this.state.x) / (this.state.length / 10)), Math.floor((y - this.state.y) / (this.state.length / 10))]
     if (x > this.state.x && x < this.state.x + this.state.length && y > this.state.y && y < this.state.y + this.state.length) {
-      if (Board.grid[box[1]][box[0]] instanceof Piece && Board.grid[box[1]][box[0]].color == this.state.playerColor && this.state.turn == this.state.playerColor) {
+      if (this.grid[box[1]][box[0]] instanceof Piece && this.grid[box[1]][box[0]].color == this.state.playerColor && this.state.turn == this.state.playerColor) {
         this.selected = box;
-        this.canMoveTo = Board.grid[box[1]][box[0]].getMovement(box[0], box[1], Board.grid);
-        for (var i = this.canMoveTo.length - 1; i >= 0; i--) {
-          var newArray = Board.grid.map((arr) => {
-            return arr.slice();
-          });
-          newArray[this.canMoveTo[i][1]][this.canMoveTo[i][0]] = newArray[this.selected[1]][this.selected[0]];
-          newArray[this.selected[1]][this.selected[0]] = null;
-          if (this.isBoardStateInCheck(this.state.turn, newArray)) {
-            this.canMoveTo.splice(i, 1);
-          }
-        }
+        this.canMoveTo = this.canMoveToGrid[box[1]][box[0]];
       } else if (this.selected != null) {
         for (var i of this.canMoveTo) {
           if (i[0] == box[0] && i[1] == box[1]) {
-            if (Board.grid[this.selected[1]][this.selected[0]] instanceof Pawn) {
-              Board.grid[this.selected[1]][this.selected[0]].firstMove = false;
+            if (this.grid[this.selected[1]][this.selected[0]] instanceof Pawn) {
+              this.grid[this.selected[1]][this.selected[0]].firstMove = false;
             }
-            Board.grid[box[1]][box[0]] = Board.grid[this.selected[1]][this.selected[0]];
-            Board.grid[this.selected[1]][this.selected[0]] = null;
+            this.grid[box[1]][box[0]] = this.grid[this.selected[1]][this.selected[0]];
+            this.grid[this.selected[1]][this.selected[0]] = null;
             this.selected = null;
             this.canMoveTo = null;
-            this.setState({ turn: !this.state.turn });
+            this.setState({ turn: !this.state.turn }, () => {
+              this.calculateMovable(this.state.turn);
+            });
           }
         }
       }
