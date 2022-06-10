@@ -2,7 +2,6 @@ const express = require('express');
 const path = require('path');
 
 const http = require('http');
-const { createSecureContext } = require('tls');
 const webSocketServer = require('websocket').server;
 
 const app = express();
@@ -51,6 +50,9 @@ wsServer.on('request', function (req) {
       for (var i in rooms[users[connectionID].room]) {
         if (rooms[users[connectionID].room][i] == connectionID) {
           rooms[users[connectionID].room].splice(i, 1);
+          if (rooms[users[connectionID].room].length == 0) {
+            delete rooms[users[connectionID].room];
+          }
         }
       }
     }

@@ -183,11 +183,10 @@ export default class Board extends React.Component {
     App.connection.onmessage = (message) => {
       var json = JSON.parse(message.data);
       if (json.type == 'boardUpdate') {
-        console.log(123)
         for (var i = 0; i < json.grid.length; i++) {
           for (var j = 0; j < json.grid[i].length; j++) {
             if (json.grid[i][j] != null) {
-              json.grid[i][j] = new (classes.get(json.grid[i][j].type))(json.grid[i][j].color)
+              json.grid[i][j] = new (classes.get(json.grid[i][j].type))(json.grid[i][j].color, json.grid[i][j].firstMove)
             }
           }
         }

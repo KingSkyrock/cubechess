@@ -15,6 +15,7 @@ export default class App extends React.Component {
     super(props);
     
     this.connection;
+    this.roomInput = React.createRef();
 
     this.state = {
 
@@ -28,8 +29,18 @@ export default class App extends React.Component {
   render() {
     return (
       <div className='main'>
-        <>Chess</>
-        <Board/>
+        {window.location.pathname.split("/").at(-1) ?
+          <>
+            <>Chess</>
+            <Board/>
+          </>
+          :
+          <>
+            <input type="text" ref={this.roomInput}/>
+            <button onClick={() => window.location.pathname = this.roomInput.current.value}>Join room</button>
+          </>
+        }
+        
       </div>
     )
   }

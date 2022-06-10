@@ -129,9 +129,9 @@ export class Bishop extends Piece {
 }
 
 export class Pawn extends Piece {
-  constructor(color) {
+  constructor(color, firstMove = true) {
     super(color)
-    this.firstMove = true;
+    this.firstMove = firstMove;
     this.type = "Pawn";
   }
 
