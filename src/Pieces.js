@@ -3,12 +3,14 @@ import Board from "./Board";
 export class Piece {
   constructor(color) { //xy on the board
     this.color = color;
+    this.type;
   }
 }
 
 export class Rook extends Piece {
   constructor(color) {
     super(color)
+    this.type = "Rook";
   }
 
   getMovement(x, y, grid) {
@@ -69,6 +71,7 @@ export class Rook extends Piece {
 export class Bishop extends Piece {
   constructor(color) {
     super(color)
+    this.type = "Bishop";
   }
   getMovement(x, y, grid) {
     var moveableCoords = [];
@@ -129,6 +132,7 @@ export class Pawn extends Piece {
   constructor(color) {
     super(color)
     this.firstMove = true;
+    this.type = "Pawn";
   }
 
   getAttacking(x, y) {
@@ -187,6 +191,7 @@ export class Pawn extends Piece {
 export class Queen extends Piece {
   constructor(color) {
     super(color)
+    this.type = "Queen";
   }
 
   getMovement(x, y, grid) {
@@ -295,6 +300,7 @@ export class Queen extends Piece {
 export class Knight extends Piece {
   constructor(color) {
     super(color)
+    this.type = "Knight";
   }
 
   getMovement(x, y, grid) {
@@ -330,6 +336,7 @@ export class Knight extends Piece {
 export class King extends Piece {
   constructor(color) {
     super(color)
+    this.type = "King";
   }
 
   pointInPointArr(arr, point) {

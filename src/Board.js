@@ -1,5 +1,6 @@
 import React from 'react';
 import './styles.scss';
+import App from "./App";
 import {Knight, Queen, Bishop, Pawn, Rook, Piece, King} from './Pieces';
 
 export default class Board extends React.Component {
@@ -99,7 +100,7 @@ export default class Board extends React.Component {
 
         if (this.grid[j][i] instanceof Piece && this.grid[j][i].color == Board.WHITE) {
           ctx.fillStyle = "#FFFFFF";
-        } else {
+        } else if (this.grid[j][i] instanceof Piece && this.grid[j][i].color == Board.BLACK) {
           ctx.fillStyle = "#000000";
         }
 
@@ -126,6 +127,16 @@ export default class Board extends React.Component {
   }
 
   componentDidMount() {
+    const classes = new Map([
+      ["Piece", Piece],
+      ["Rook", Rook],
+      ["Bishop", Bishop],
+      ["Queen", Queen],
+      ["Knight", Knight],
+      ["Pawn", Pawn],
+      ["King", King],
+    ]);
+
     this.grid = [];
     for (var i = 0; i < 10; i++) {
       this.grid.push([null, null, null, null, null, null, null, null, null, null]);
@@ -161,6 +172,32 @@ export default class Board extends React.Component {
 
     this.calculateMovable(Board.WHITE);
     this.drawBoard();
+
+    App.connection.onopen = () => {
+      App.connection.send(JSON.stringify({
+        type: 'joinRoom',
+        room: window.location.pathname
+      }));
+    }
+
+    App.connection.onmessage = (message) => {
+      var json = JSON.parse(message.data);
+      if (json.type == 'boardUpdate') {
+        console.log(123)
+        for (var i = 0; i < json.grid.length; i++) {
+          for (var j = 0; j < json.grid[i].length; j++) {
+            if (json.grid[i][j] != null) {
+              json.grid[i][j] = new (classes.get(json.grid[i][j].type))(json.grid[i][j].color)
+            }
+          }
+        }
+      }
+      
+      this.canMoveToGrid = json.canMoveToGrid;
+      this.grid = json.grid;
+      this.setState({turn: json.turn});
+      this.drawBoard();
+    }
   }
 
   isBoardStateInCheck(color, grid) {
@@ -226,10 +263,18 @@ export default class Board extends React.Component {
                 }
               }
               if (total == 0 && this.isBoardStateInCheck(this.state.turn, this.grid)) {
-                alert("Checkmate: " + (this.state.turn == Board.WHITE ? "White" : "Black") + " wins!");
+                alert("Checkmate: " + (this.state.turn == Board.WHITE ? "White" : (this.state.turn == Board.BLACK && "Black")) + " wins!");
               } else if (total == 0) {
                 alert("Stalemate!");
               }
+
+              App.connection.send(JSON.stringify({
+                type: 'moved',
+                grid: this.grid,
+                canMoveToGrid: this.canMoveToGrid, 
+                turn: this.state.turn, 
+                room: window.location.pathname 
+              }));
             });
           }
         }
