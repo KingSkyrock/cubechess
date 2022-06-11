@@ -80,8 +80,8 @@ export default class Board extends React.Component {
     ctx.font = Math.round(this.state.length/8)+"px Arial";
     for (var i = 0, boardX, boardY; i < this.grid.length; i++) {
       for (var j = 0; j < this.grid[i].length; j++) {
-        boardX = i * gridUnit + x;
-        boardY = (j + 1) * gridUnit + y;
+        boardX = j * gridUnit + x;
+        boardY = (i + 1) * gridUnit + y;
 
         if (i % 2) {
           if (j % 2) {
@@ -96,25 +96,25 @@ export default class Board extends React.Component {
             ctx.fillStyle = "#6f6a52";
           }
         }
-        ctx.fillRect(boardX, j * gridUnit + y, gridUnit, gridUnit);
+        ctx.fillRect(boardX, i * gridUnit + y, gridUnit, gridUnit);
 
-        if (this.grid[j][i] instanceof Piece && this.grid[j][i].color == Board.WHITE) {
+        if (this.grid[i][j] instanceof Piece && this.grid[i][j].color == Board.WHITE) {
           ctx.fillStyle = "#FFFFFF";
-        } else if (this.grid[j][i] instanceof Piece && this.grid[j][i].color == Board.BLACK) {
+        } else if (this.grid[i][j] instanceof Piece && this.grid[i][j].color == Board.BLACK) {
           ctx.fillStyle = "#000000";
         }
 
-        if (this.grid[j][i] instanceof Rook) {
+        if (this.grid[i][j] instanceof Rook) {
           ctx.fillText("R", boardX, boardY);
-        } else if (this.grid[j][i] instanceof Bishop) {
+        } else if (this.grid[i][j] instanceof Bishop) {
           ctx.fillText("B", boardX, boardY);
-        } else if (this.grid[j][i] instanceof Pawn) {
+        } else if (this.grid[i][j] instanceof Pawn) {
           ctx.fillText("P", boardX, boardY);
-        } else if (this.grid[j][i] instanceof Queen) {
+        } else if (this.grid[i][j] instanceof Queen) {
           ctx.fillText("Q", boardX, boardY);
-        } else if (this.grid[j][i] instanceof Knight) {
+        } else if (this.grid[i][j] instanceof Knight) {
           ctx.fillText("K", boardX, boardY);
-        } else if (this.grid[j][i] instanceof King) {
+        } else if (this.grid[i][j] instanceof King) {
           ctx.fillText("O", boardX, boardY);
         }
       }
@@ -138,36 +138,36 @@ export default class Board extends React.Component {
     ]);
 
     this.grid = [];
-    for (var i = 0; i < 10; i++) {
+    for (var i = 0; i < 8; i++) {
       this.grid.push([null, null, null, null, null, null, null, null, null, null]);
     }
 
     this.canMoveToGrid = [];
-    for (var i = 0; i < 10; i++) {
+    for (var i = 0; i < 8; i++) {
       this.canMoveToGrid.push([null, null, null, null, null, null, null, null, null, null]);
     }
 
-    this.grid[1][1] = new Rook(Board.BLACK);
-    this.grid[1][2] = new Knight(Board.BLACK);
-    this.grid[1][3] = new Bishop(Board.BLACK);
-    this.grid[1][4] = new Queen(Board.BLACK);
-    this.grid[1][5] = new King(Board.BLACK);
-    this.grid[1][6] = new Bishop(Board.BLACK);
-    this.grid[1][7] = new Knight(Board.BLACK);
-    this.grid[1][8] = new Rook(Board.BLACK);
+    this.grid[0][1] = new Rook(Board.BLACK);
+    this.grid[0][2] = new Knight(Board.BLACK);
+    this.grid[0][3] = new Bishop(Board.BLACK);
+    this.grid[0][4] = new Queen(Board.BLACK);
+    this.grid[0][5] = new King(Board.BLACK);
+    this.grid[0][6] = new Bishop(Board.BLACK);
+    this.grid[0][7] = new Knight(Board.BLACK);
+    this.grid[0][8] = new Rook(Board.BLACK);
 
-    this.grid[8][1] = new Rook(Board.WHITE);
-    this.grid[8][2] = new Knight(Board.WHITE);
-    this.grid[8][3] = new Bishop(Board.WHITE);
-    this.grid[8][4] = new Queen(Board.WHITE);
-    this.grid[8][5] = new King(Board.WHITE);
-    this.grid[8][6] = new Bishop(Board.WHITE);
-    this.grid[8][7] = new Knight(Board.WHITE);
-    this.grid[8][8] = new Rook(Board.WHITE);
+    this.grid[7][1] = new Rook(Board.WHITE);
+    this.grid[7][2] = new Knight(Board.WHITE);
+    this.grid[7][3] = new Bishop(Board.WHITE);
+    this.grid[7][4] = new Queen(Board.WHITE);
+    this.grid[7][5] = new King(Board.WHITE);
+    this.grid[7][6] = new Bishop(Board.WHITE);
+    this.grid[7][7] = new Knight(Board.WHITE);
+    this.grid[7][8] = new Rook(Board.WHITE);
 
     for (var i = 0; i < 8; i++) {
-      this.grid[7][i + 1] = new Pawn(Board.WHITE);
-      this.grid[2][i + 1] = new Pawn(Board.BLACK);
+      this.grid[6][i + 1] = new Pawn(Board.WHITE);
+      this.grid[1][i + 1] = new Pawn(Board.BLACK);
     }
 
     this.calculateMovable(Board.WHITE);
@@ -237,7 +237,7 @@ export default class Board extends React.Component {
     var x = (event.pageX - canvas.offsetLeft);
     var y = (event.pageY - canvas.offsetTop);
     var box = [Math.floor((x - this.state.x) / (this.state.length / 10)), Math.floor((y - this.state.y) / (this.state.length / 10))]
-    if (x > this.state.x && x < this.state.x + this.state.length && y > this.state.y && y < this.state.y + this.state.length) {
+    if (x > this.state.x && x < this.state.x + this.state.length && y > this.state.y && y < this.state.y + this.state.length - this.state.length / 5) {
       if (this.grid[box[1]][box[0]] instanceof Piece && this.grid[box[1]][box[0]].color == this.state.playerColor && this.state.turn == this.state.playerColor) {
         this.selected = box;
         this.canMoveTo = this.canMoveToGrid[box[1]][box[0]];
