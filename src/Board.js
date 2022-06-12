@@ -1,7 +1,7 @@
 import React from 'react';
 import './styles.scss';
 import App from "./App";
-import {Knight, Queen, Bishop, Pawn, Rook, Piece, King} from './Pieces';
+import {Knight, Queen, Bishop, Pawn, Rook, Piece, King, Wazir, Ferz, Mann} from './Pieces';
 
 export default class Board extends React.Component {
 
@@ -116,6 +116,12 @@ export default class Board extends React.Component {
           ctx.fillText("K", boardX, boardY);
         } else if (this.grid[i][j] instanceof King) {
           ctx.fillText("O", boardX, boardY);
+        } else if (this.grid[i][j] instanceof Wazir) {
+          ctx.fillText("W", boardX, boardY);
+        } else if (this.grid[i][j] instanceof Ferz) {
+          ctx.fillText("F", boardX, boardY);
+        } else if (this.grid[i][j] instanceof Mann) {
+          ctx.fillText("M", boardX, boardY);
         }
       }
     }

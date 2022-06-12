@@ -3,6 +3,7 @@ import Board from "./Board";
 export class Piece {
   constructor(color) { //xy on the board
     this.color = color;
+    this.value;
     this.type;
   }
 }
@@ -11,6 +12,7 @@ export class Rook extends Piece {
   constructor(color) {
     super(color)
     this.type = "Rook";
+    this.value = 5;
   }
 
   getMovement(x, y, grid) {
@@ -72,6 +74,7 @@ export class Bishop extends Piece {
   constructor(color) {
     super(color)
     this.type = "Bishop";
+    this.value = 3;
   }
   getMovement(x, y, grid) {
     var moveableCoords = [];
@@ -133,6 +136,7 @@ export class Pawn extends Piece {
     super(color)
     this.firstMove = firstMove;
     this.type = "Pawn";
+    this.value = 1;
   }
 
   getAttacking(x, y) {
@@ -192,6 +196,7 @@ export class Queen extends Piece {
   constructor(color) {
     super(color)
     this.type = "Queen";
+    this.value = 9;
   }
 
   getMovement(x, y, grid) {
@@ -301,6 +306,7 @@ export class Knight extends Piece {
   constructor(color) {
     super(color)
     this.type = "Knight";
+    this.value = 3;
   }
 
   getMovement(x, y, grid) {
@@ -337,18 +343,99 @@ export class King extends Piece {
   constructor(color) {
     super(color)
     this.type = "King";
-  }
-
-  pointInPointArr(arr, point) {
-    for (var x of arr) {
-      if (point[0] == x[0] && point[1] == x[1]) {
-        return true;
-      }
-    }
-    return false;
+    this.value = 0;
   }
 
   getMovement(x, y, grid) { 
+    var moveableCoords = [];
+    if (x - 1 >= 0 && !(grid[y][x - 1] instanceof Piece && grid[y][x - 1].color == this.color)) { //left
+      moveableCoords.push([x - 1, y])
+    }
+    if (x + 1 <= 9 && !(grid[y][x + 1] instanceof Piece && grid[y][x + 1].color == this.color)) { //right
+      moveableCoords.push([x + 1, y])
+    }
+    if (y - 1 >= 0 && !(grid[y - 1][x] instanceof Piece && grid[y - 1][x].color == this.color)) { //up
+      moveableCoords.push([x, y - 1])
+    }
+    if (y + 1 <= 7 && !(grid[y + 1][x] instanceof Piece && grid[y + 1][x].color == this.color)) { //down
+      moveableCoords.push([x, y + 1])
+    }
+    if (x - 1 >= 0 && y - 1 >= 0 && !(grid[y - 1][x - 1] instanceof Piece && grid[y - 1][x - 1].color == this.color)) { //up left
+      moveableCoords.push([x - 1, y - 1])
+    }
+    if (x + 1 <= 9 && y - 1 >= 0 && !(grid[y - 1][x + 1] instanceof Piece && grid[y - 1][x + 1].color == this.color)) { //up right
+      moveableCoords.push([x + 1, y - 1])
+    }
+    if (x - 1 >= 0 && y + 1 <= 7 && !(grid[y + 1][x - 1] instanceof Piece && grid[y + 1][x - 1].color == this.color)) { //down left
+      moveableCoords.push([x - 1, y + 1])
+    }
+    if (x + 1 <= 9 && y + 1 <= 7 && !(grid[y + 1][x + 1] instanceof Piece && grid[y + 1][x + 1].color == this.color)) { //down right
+      moveableCoords.push([x + 1, y + 1])
+    }
+    return moveableCoords;
+  }
+}
+
+//Fairies:
+
+export class Wazir extends Piece {
+  constructor(color) {
+    super(color)
+    this.type = "Wazir";
+    this.value = 1;
+  }
+
+  getMovement(x, y, grid) {
+    var moveableCoords = [];
+    if (x - 1 >= 0 && !(grid[y][x - 1] instanceof Piece && grid[y][x - 1].color == this.color)) { //left
+      moveableCoords.push([x - 1, y])
+    }
+    if (x + 1 <= 9 && !(grid[y][x + 1] instanceof Piece && grid[y][x + 1].color == this.color)) { //right
+      moveableCoords.push([x + 1, y])
+    }
+    if (y - 1 >= 0 && !(grid[y - 1][x] instanceof Piece && grid[y - 1][x].color == this.color)) { //up
+      moveableCoords.push([x, y - 1])
+    }
+    if (y + 1 <= 7 && !(grid[y + 1][x] instanceof Piece && grid[y + 1][x].color == this.color)) { //down
+      moveableCoords.push([x, y + 1])
+    }
+    return moveableCoords;
+  }
+}
+
+export class Ferz extends Piece {
+  constructor(color) {
+    super(color)
+    this.type = "Ferz";
+    this.value = 1.5;
+  }
+
+  getMovement(x, y, grid) {
+    var moveableCoords = [];
+    if (x - 1 >= 0 && y - 1 >= 0 && !(grid[y - 1][x - 1] instanceof Piece && grid[y - 1][x - 1].color == this.color)) { //up left
+      moveableCoords.push([x - 1, y - 1])
+    }
+    if (x + 1 <= 9 && y - 1 >= 0 && !(grid[y - 1][x + 1] instanceof Piece && grid[y - 1][x + 1].color == this.color)) { //up right
+      moveableCoords.push([x + 1, y - 1])
+    }
+    if (x - 1 >= 0 && y + 1 <= 7 && !(grid[y + 1][x - 1] instanceof Piece && grid[y + 1][x - 1].color == this.color)) { //down left
+      moveableCoords.push([x - 1, y + 1])
+    }
+    if (x + 1 <= 9 && y + 1 <= 7 && !(grid[y + 1][x + 1] instanceof Piece && grid[y + 1][x + 1].color == this.color)) { //down right
+      moveableCoords.push([x + 1, y + 1])
+    }
+    return moveableCoords;
+  }
+}
+
+export class Mann extends Piece {
+  constructor(color) {
+    super(color)
+    this.type = "Mann";
+    this.value = 3;
+  }
+
+  getMovement(x, y, grid) {
     var moveableCoords = [];
     if (x - 1 >= 0 && !(grid[y][x - 1] instanceof Piece && grid[y][x - 1].color == this.color)) { //left
       moveableCoords.push([x - 1, y])
