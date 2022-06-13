@@ -26,6 +26,19 @@ export default class App extends React.Component {
     
   }
 
+  randomRoom() {
+    App.connection.send(JSON.stringify({
+      type: 'randomRoom'
+    }));
+
+    App.connection.onmessage = (message) => {
+      var json = JSON.parse(message.data);
+      if (json.type == 'randomRoom') {
+        window.location.pathname = json.room;
+      }
+    }
+  }
+
   render() {
     return (
       <div className='main'>
@@ -38,6 +51,8 @@ export default class App extends React.Component {
           <>
             <input type="text" ref={this.roomInput}/>
             <button onClick={() => window.location.pathname = this.roomInput.current.value}>Join room</button>
+            <br />
+            <button onClick={() => this.randomRoom()}>Join random room</button>
           </>
         }
         

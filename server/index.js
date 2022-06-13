@@ -42,6 +42,13 @@ wsServer.on('request', function (req) {
         }
         users[connectionID].room = json.room;
         console.log(rooms);
+      } else if (json.type == "randomRoom") {
+        for (const room in rooms) {
+          if (rooms[room].length < 2) {
+            connection.sendUTF(JSON.stringify({ type: 'randomRoom', room: room }));
+            break;
+          }
+        }
       }
     }
   });

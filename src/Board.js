@@ -77,9 +77,28 @@ export default class Board extends React.Component {
     ctx.closePath();
     ctx.stroke();*/
 
-    ctx.font = Math.round(this.state.length/8)+"px Arial";
-    for (var i = 0, boardX, boardY; i < this.grid.length; i++) {
-      for (var j = 0; j < this.grid[i].length; j++) {
+    var drawingGrid = this.grid.map((arr) => {
+      return arr.slice();
+    });
+    if (this.canMoveTo != null) {
+      var drawingCanMoveTo = this.canMoveTo.map((arr) => {
+        return arr.slice();
+      });
+    }
+
+    if (this.state.playerColor == Board.BLACK) {
+      drawingGrid = drawingGrid.reverse();
+      if (drawingCanMoveTo != null) {
+        for (i in drawingCanMoveTo) {
+          drawingCanMoveTo[i][1] = 7 - drawingCanMoveTo[i][1];
+        }
+      }
+      
+    }
+
+    ctx.font = Math.round(this.state.length / 8)+"px Arial";
+    for (var i = 0, boardX, boardY; i < drawingGrid.length; i++) {
+      for (var j = 0; j < drawingGrid[i].length; j++) {
         boardX = j * gridUnit + x;
         boardY = (i + 1) * gridUnit + y;
 
@@ -98,36 +117,36 @@ export default class Board extends React.Component {
         }
         ctx.fillRect(boardX, i * gridUnit + y, gridUnit, gridUnit);
 
-        if (this.grid[i][j] instanceof Piece && this.grid[i][j].color == Board.WHITE) {
+        if (drawingGrid[i][j] instanceof Piece && drawingGrid[i][j].color == Board.WHITE) {
           ctx.fillStyle = "#FFFFFF";
-        } else if (this.grid[i][j] instanceof Piece && this.grid[i][j].color == Board.BLACK) {
+        } else if (drawingGrid[i][j] instanceof Piece && drawingGrid[i][j].color == Board.BLACK) {
           ctx.fillStyle = "#000000";
         }
 
-        if (this.grid[i][j] instanceof Rook) {
+        if (drawingGrid[i][j] instanceof Rook) {
           ctx.fillText("R", boardX, boardY);
-        } else if (this.grid[i][j] instanceof Bishop) {
+        } else if (drawingGrid[i][j] instanceof Bishop) {
           ctx.fillText("B", boardX, boardY);
-        } else if (this.grid[i][j] instanceof Pawn) {
+        } else if (drawingGrid[i][j] instanceof Pawn) {
           ctx.fillText("P", boardX, boardY);
-        } else if (this.grid[i][j] instanceof Queen) {
+        } else if (drawingGrid[i][j] instanceof Queen) {
           ctx.fillText("Q", boardX, boardY);
-        } else if (this.grid[i][j] instanceof Knight) {
+        } else if (drawingGrid[i][j] instanceof Knight) {
           ctx.fillText("K", boardX, boardY);
-        } else if (this.grid[i][j] instanceof King) {
+        } else if (drawingGrid[i][j] instanceof King) {
           ctx.fillText("O", boardX, boardY);
-        } else if (this.grid[i][j] instanceof Wazir) {
+        } else if (drawingGrid[i][j] instanceof Wazir) {
           ctx.fillText("W", boardX, boardY);
-        } else if (this.grid[i][j] instanceof Ferz) {
+        } else if (drawingGrid[i][j] instanceof Ferz) {
           ctx.fillText("F", boardX, boardY);
-        } else if (this.grid[i][j] instanceof Mann) {
+        } else if (drawingGrid[i][j] instanceof Mann) {
           ctx.fillText("M", boardX, boardY);
         }
       }
     }
-    for (var i in this.canMoveTo) {
+    for (var i in drawingCanMoveTo) {
       ctx.fillStyle = '#00ff00';
-      ctx.fillRect(this.canMoveTo[i][0] * gridUnit + x, this.canMoveTo[i][1] * gridUnit + y, gridUnit, gridUnit);
+      ctx.fillRect(drawingCanMoveTo[i][0] * gridUnit + x, drawingCanMoveTo[i][1] * gridUnit + y, gridUnit, gridUnit);
       ctx.fillStyle = '#000000';
     }
   }
@@ -196,12 +215,11 @@ export default class Board extends React.Component {
             }
           }
         }
+        this.canMoveToGrid = json.canMoveToGrid;
+        this.grid = json.grid;
+        this.setState({ turn: json.turn });
+        this.drawBoard();
       }
-      
-      this.canMoveToGrid = json.canMoveToGrid;
-      this.grid = json.grid;
-      this.setState({turn: json.turn});
-      this.drawBoard();
     }
   }
 
@@ -243,6 +261,9 @@ export default class Board extends React.Component {
     var x = (event.pageX - canvas.offsetLeft);
     var y = (event.pageY - canvas.offsetTop);
     var box = [Math.floor((x - this.state.x) / (this.state.length / 10)), Math.floor((y - this.state.y) / (this.state.length / 10))]
+    if (this.state.playerColor == Board.BLACK) {
+      box[1] = 7 - box[1];
+    }
     if (x > this.state.x && x < this.state.x + this.state.length && y > this.state.y && y < this.state.y + this.state.length - this.state.length / 5) {
       if (this.grid[box[1]][box[0]] instanceof Piece && this.grid[box[1]][box[0]].color == this.state.playerColor && this.state.turn == this.state.playerColor) {
         this.selected = box;
@@ -294,8 +315,8 @@ export default class Board extends React.Component {
     return (
       <div>
         <canvas width="1000" height="900" onMouseDown={(e) => this.handleClick(this.canvas.current, e)} ref={this.canvas} className="game"></canvas>
-        <button onClick={() => this.setState({playerColor: Board.WHITE })}>white</button>
-        <button onClick={() => this.setState({ playerColor: Board.BLACK })}>black</button>
+        <button onClick={() => this.setState({ playerColor: Board.WHITE }, () => this.drawBoard())}>white</button>
+        <button onClick={() => this.setState({ playerColor: Board.BLACK }, () => this.drawBoard())}>black</button>
       </div>
     )
   }
