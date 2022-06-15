@@ -160,6 +160,9 @@ export default class Board extends React.Component {
       ["Knight", Knight],
       ["Pawn", Pawn],
       ["King", King],
+      ["Wazir", Wazir],
+      ["Ferz", Ferz],
+      ["Mann", Mann],
     ]);
 
     this.grid = [];

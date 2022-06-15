@@ -34,7 +34,7 @@ export default class App extends React.Component {
     App.connection.onmessage = (message) => {
       var json = JSON.parse(message.data);
       if (json.type == 'randomRoom') {
-        window.location.pathname = json.room;
+        window.location.pathname = "play/" + json.room;
       }
     }
   }
@@ -42,7 +42,7 @@ export default class App extends React.Component {
   render() {
     return (
       <div className='main'>
-        {window.location.pathname.split("/").at(-1) ?
+        {window.location.pathname.split("/").at(1) == "play" && window.location.pathname.split("/").at(2)?
           <>
             <>Chess</>
             <Board/>
@@ -50,7 +50,7 @@ export default class App extends React.Component {
           :
           <>
             <input type="text" ref={this.roomInput}/>
-            <button onClick={() => window.location.pathname = this.roomInput.current.value}>Join room</button>
+            <button onClick={() => window.location.pathname = "play/" + this.roomInput.current.value}>Join room</button>
             <br />
             <button onClick={() => this.randomRoom()}>Join random room</button>
           </>
