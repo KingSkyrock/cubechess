@@ -1,6 +1,7 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
 import Board from './Board.js';
+import Teambuilder from './Teambuilder.js';
 import './styles.scss';
 
 export default class App extends React.Component {
@@ -42,17 +43,25 @@ export default class App extends React.Component {
   render() {
     return (
       <div className='main'>
-        {window.location.pathname.split("/").at(1) == "play" && window.location.pathname.split("/").at(2)?
+        {window.location.pathname.split("/").at(1) == "play" && window.location.pathname.split("/").at(2) ?
           <>
             <>Chess</>
             <Board/>
           </>
+          : window.location.pathname.split("/").at(1) == "teambuilder" ?
+            <>
+              <>Teambuilder</>
+              <Teambuilder />
+            </>
           :
           <>
             <input type="text" ref={this.roomInput}/>
             <button onClick={() => window.location.pathname = "play/" + this.roomInput.current.value}>Join room</button>
             <br />
             <button onClick={() => this.randomRoom()}>Join random room</button>
+            <br />
+            <br />
+            <button onClick={() => window.location.pathname = "teambuilder"}>Teambuilder</button>
           </>
         }
         

@@ -1,7 +1,8 @@
 import React from 'react';
 import './styles.scss';
 import App from "./App";
-import {Knight, Queen, Bishop, Pawn, Rook, Piece, King, Wazir, Ferz, Mann} from './Pieces';
+import * as P from './Pieces';
+
 
 export default class Board extends React.Component {
 
@@ -20,6 +21,7 @@ export default class Board extends React.Component {
     this.selected = null;
     this.canMoveTo = [];
     this.canMoveToGrid;
+    this.enPassant; //two coordinates
     this.grid;
     this.red = [];
     this.colorInCheck = null;
@@ -37,8 +39,8 @@ export default class Board extends React.Component {
     var allAttacking = [];
     for (var i = 0; i < grid.length; i++) {
       for (var j = 0; j < grid[i].length; j++) {
-        if (grid[i][j] instanceof Piece && grid[i][j].color == color) {
-          if (grid[i][j] instanceof Pawn) {
+        if (grid[i][j] instanceof P.Piece && grid[i][j].color == color) {
+          if (grid[i][j] instanceof P.Pawn) {
             for (var coord of grid[i][j].getAttacking(j, i)) {
               allAttacking.push(coord);
             }
@@ -117,54 +119,44 @@ export default class Board extends React.Component {
         }
         ctx.fillRect(boardX, i * gridUnit + y, gridUnit, gridUnit);
 
-        if (drawingGrid[i][j] instanceof Piece && drawingGrid[i][j].color == Board.WHITE) {
+        if (drawingGrid[i][j] instanceof P.Piece && drawingGrid[i][j].color == Board.WHITE) {
           ctx.fillStyle = "#FFFFFF";
-        } else if (drawingGrid[i][j] instanceof Piece && drawingGrid[i][j].color == Board.BLACK) {
+        } else if (drawingGrid[i][j] instanceof P.Piece && drawingGrid[i][j].color == Board.BLACK) {
           ctx.fillStyle = "#000000";
         }
 
-        if (drawingGrid[i][j] instanceof Rook) {
+        if (drawingGrid[i][j] instanceof P.Rook) {
           ctx.fillText("R", boardX, boardY);
-        } else if (drawingGrid[i][j] instanceof Bishop) {
+        } else if (drawingGrid[i][j] instanceof P.Bishop) {
           ctx.fillText("B", boardX, boardY);
-        } else if (drawingGrid[i][j] instanceof Pawn) {
+        } else if (drawingGrid[i][j] instanceof P.Pawn) {
           ctx.fillText("P", boardX, boardY);
-        } else if (drawingGrid[i][j] instanceof Queen) {
+        } else if (drawingGrid[i][j] instanceof P.Queen) {
           ctx.fillText("Q", boardX, boardY);
-        } else if (drawingGrid[i][j] instanceof Knight) {
+        } else if (drawingGrid[i][j] instanceof P.Knight) {
           ctx.fillText("K", boardX, boardY);
-        } else if (drawingGrid[i][j] instanceof King) {
+        } else if (drawingGrid[i][j] instanceof P.King) {
           ctx.fillText("O", boardX, boardY);
-        } else if (drawingGrid[i][j] instanceof Wazir) {
+        } else if (drawingGrid[i][j] instanceof P.Wazir) {
           ctx.fillText("W", boardX, boardY);
-        } else if (drawingGrid[i][j] instanceof Ferz) {
+        } else if (drawingGrid[i][j] instanceof P.Ferz) {
           ctx.fillText("F", boardX, boardY);
-        } else if (drawingGrid[i][j] instanceof Mann) {
+        } else if (drawingGrid[i][j] instanceof P.Mann) {
           ctx.fillText("M", boardX, boardY);
         }
       }
     }
     for (var i in drawingCanMoveTo) {
       ctx.fillStyle = '#00ff00';
-      ctx.fillRect(drawingCanMoveTo[i][0] * gridUnit + x, drawingCanMoveTo[i][1] * gridUnit + y, gridUnit, gridUnit);
+      ctx.beginPath();
+      ctx.arc(drawingCanMoveTo[i][0] * gridUnit + x + gridUnit / 2, drawingCanMoveTo[i][1] * gridUnit + y + gridUnit / 2, gridUnit / 5, 0, 2 * Math.PI, false);
+      ctx.fill();
+      ctx.closePath();
       ctx.fillStyle = '#000000';
     }
   }
 
   componentDidMount() {
-    const classes = new Map([
-      ["Piece", Piece],
-      ["Rook", Rook],
-      ["Bishop", Bishop],
-      ["Queen", Queen],
-      ["Knight", Knight],
-      ["Pawn", Pawn],
-      ["King", King],
-      ["Wazir", Wazir],
-      ["Ferz", Ferz],
-      ["Mann", Mann],
-    ]);
-
     this.grid = [];
     for (var i = 0; i < 8; i++) {
       this.grid.push([null, null, null, null, null, null, null, null, null, null]);
@@ -175,27 +167,31 @@ export default class Board extends React.Component {
       this.canMoveToGrid.push([null, null, null, null, null, null, null, null, null, null]);
     }
 
-    this.grid[0][1] = new Rook(Board.BLACK);
-    this.grid[0][2] = new Knight(Board.BLACK);
-    this.grid[0][3] = new Bishop(Board.BLACK);
-    this.grid[0][4] = new Queen(Board.BLACK);
-    this.grid[0][5] = new King(Board.BLACK);
-    this.grid[0][6] = new Bishop(Board.BLACK);
-    this.grid[0][7] = new Knight(Board.BLACK);
-    this.grid[0][8] = new Rook(Board.BLACK);
+    this.grid[0][0] = new P.Mann(Board.BLACK);
+    this.grid[0][1] = new P.Rook(Board.BLACK);
+    this.grid[0][2] = new P.Knight(Board.BLACK);
+    this.grid[0][3] = new P.Bishop(Board.BLACK);
+    this.grid[0][4] = new P.Queen(Board.BLACK);
+    this.grid[0][5] = new P.King(Board.BLACK);
+    this.grid[0][6] = new P.Bishop(Board.BLACK);
+    this.grid[0][7] = new P.Knight(Board.BLACK);
+    this.grid[0][8] = new P.Rook(Board.BLACK);
+    this.grid[0][9] = new P.Mann(Board.BLACK);
 
-    this.grid[7][1] = new Rook(Board.WHITE);
-    this.grid[7][2] = new Knight(Board.WHITE);
-    this.grid[7][3] = new Bishop(Board.WHITE);
-    this.grid[7][4] = new Queen(Board.WHITE);
-    this.grid[7][5] = new King(Board.WHITE);
-    this.grid[7][6] = new Bishop(Board.WHITE);
-    this.grid[7][7] = new Knight(Board.WHITE);
-    this.grid[7][8] = new Rook(Board.WHITE);
+    this.grid[7][0] = new P.Mann(Board.WHITE);
+    this.grid[7][1] = new P.Rook(Board.WHITE);
+    this.grid[7][2] = new P.Knight(Board.WHITE);
+    this.grid[7][3] = new P.Bishop(Board.WHITE);
+    this.grid[7][4] = new P.Queen(Board.WHITE);
+    this.grid[7][5] = new P.King(Board.WHITE);
+    this.grid[7][6] = new P.Bishop(Board.WHITE);
+    this.grid[7][7] = new P.Knight(Board.WHITE);
+    this.grid[7][8] = new P.Rook(Board.WHITE);
+    this.grid[7][9] = new P.Mann(Board.WHITE);
 
-    for (var i = 0; i < 8; i++) {
-      this.grid[6][i + 1] = new Pawn(Board.WHITE);
-      this.grid[1][i + 1] = new Pawn(Board.BLACK);
+    for (var i = 0; i < 10; i++) {
+      this.grid[6][i] = new P.Pawn(Board.WHITE);
+      this.grid[1][i] = new P.Pawn(Board.BLACK);
     }
 
     this.calculateMovable(Board.WHITE);
@@ -214,7 +210,7 @@ export default class Board extends React.Component {
         for (var i = 0; i < json.grid.length; i++) {
           for (var j = 0; j < json.grid[i].length; j++) {
             if (json.grid[i][j] != null) {
-              json.grid[i][j] = new (classes.get(json.grid[i][j].type))(json.grid[i][j].color, json.grid[i][j].firstMove)
+              json.grid[i][j] = new (P[json.grid[i][j].type])(json.grid[i][j].color, json.grid[i][j].firstMove)
             }
           }
         }
@@ -228,7 +224,7 @@ export default class Board extends React.Component {
 
   isBoardStateInCheck(color, grid) {
     for (var x of Board.getAllAttacking(!color, grid)) {
-      if (grid[x[1]][x[0]] instanceof King && grid[x[1]][x[0]].color == color) {
+      if (grid[x[1]][x[0]] instanceof P.King && grid[x[1]][x[0]].color == color) {
         return true;
       }
     }
@@ -242,7 +238,7 @@ export default class Board extends React.Component {
     }
     for (var i = 0; i < this.grid.length; i++) {
       for (var j = 0; j < this.grid[i].length; j++) {
-        if (this.grid[i][j] instanceof Piece && this.grid[i][j].color == color) {
+        if (this.grid[i][j] instanceof P.Piece && this.grid[i][j].color == color) {
           var canMoveTo = this.grid[i][j].getMovement(j, i, this.grid);
           for (var k = canMoveTo.length - 1; k >= 0; k--) {
             var newArray = this.grid.map((arr) => {
@@ -268,13 +264,13 @@ export default class Board extends React.Component {
       box[1] = 7 - box[1];
     }
     if (x > this.state.x && x < this.state.x + this.state.length && y > this.state.y && y < this.state.y + this.state.length - this.state.length / 5) {
-      if (this.grid[box[1]][box[0]] instanceof Piece && this.grid[box[1]][box[0]].color == this.state.playerColor && this.state.turn == this.state.playerColor) {
+      if (this.grid[box[1]][box[0]] instanceof P.Piece && this.grid[box[1]][box[0]].color == this.state.playerColor && this.state.turn == this.state.playerColor) {
         this.selected = box;
         this.canMoveTo = this.canMoveToGrid[box[1]][box[0]];
       } else if (this.selected != null) {
         for (var i of this.canMoveTo) {
           if (i[0] == box[0] && i[1] == box[1]) {
-            if (this.grid[this.selected[1]][this.selected[0]] instanceof Pawn) {
+            if (this.grid[this.selected[1]][this.selected[0]] instanceof P.Pawn) {
               this.grid[this.selected[1]][this.selected[0]].firstMove = false;
             }
             this.grid[box[1]][box[0]] = this.grid[this.selected[1]][this.selected[0]];
