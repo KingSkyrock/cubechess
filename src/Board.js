@@ -129,7 +129,7 @@ export default class Board extends React.Component {
           ctx.fillText("R", boardX, boardY);
         } else if (drawingGrid[i][j] instanceof P.Bishop) {
           ctx.fillText("B", boardX, boardY);
-        } else if (drawingGrid[i][j] instanceof P.Pawn) {
+        } else if (drawingGrid[i][j] instanceof P.Pawn && !(drawingGrid[i][j] instanceof P.AntiPawn)) {
           ctx.fillText("P", boardX, boardY);
         } else if (drawingGrid[i][j] instanceof P.Queen) {
           ctx.fillText("Q", boardX, boardY);
@@ -143,6 +143,8 @@ export default class Board extends React.Component {
           ctx.fillText("F", boardX, boardY);
         } else if (drawingGrid[i][j] instanceof P.Mann) {
           ctx.fillText("M", boardX, boardY);
+        } else if (drawingGrid[i][j] instanceof P.AntiPawn) {
+          ctx.fillText("d", boardX, boardY);
         }
       }
     }

@@ -464,3 +464,64 @@ export class Mann extends Piece {
     return moveableCoords;
   }
 }
+
+export class AntiPawn extends Pawn {
+  constructor(color, firstMove = true) {
+    super(color)
+    this.firstMove = firstMove;
+    this.type = "AntiPawn";
+    this.value = 1;
+  }
+
+  getAttacking(x, y) {
+    var attacking = [];
+    if (this.color == Board.WHITE) {
+      if (y - 1 >= 0) {
+        attacking.push([x, y - 1])
+      }
+    } else if (this.color == Board.BLACK) {
+      if (y + 1 <= 7) {
+        attacking.push([x, y + 1])
+      }
+    }
+    return attacking;
+  }
+
+  getMovement(x, y, grid) {
+    var moveableCoords = [];
+    if (this.color == Board.WHITE) {
+      if (y - 1 >= 0 && x - 1 >= 0 && !grid[y - 1][x - 1]) { //left
+        moveableCoords.push([x - 1, y - 1])
+        if (this.firstMove && y - 2 >= 0 && x - 2 >= 0 && !grid[y - 2][x - 2]) {
+          moveableCoords.push([x - 2, y - 2])
+        }
+      }
+      if (y - 1 >= 0 && x + 1 <= 9 && !grid[y - 1][x + 1]) { //right
+        moveableCoords.push([x + 1, y - 1])
+        if (this.firstMove && y - 2 >= 0 && x + 2 <= 9 && !grid[y - 2][x + 2]) {
+          moveableCoords.push([x + 2, y - 2])
+        }
+      }
+      if (y - 1 >= 0 && grid[y - 1][x] instanceof Piece && grid[y - 1][x].color != this.color) {
+        moveableCoords.push([x, y - 1])
+      }
+    } else if (this.color == Board.BLACK) {
+      if (y + 1 <= 7 && x - 1 >= 0 && !grid[y + 1][x - 1]) { //left
+        moveableCoords.push([x - 1, y + 1])
+        if (this.firstMove && y + 2 >= 0 && x - 2 >= 0 && !grid[y + 2][x - 2]) {
+          moveableCoords.push([x - 2, y + 2])
+        }
+      }
+      if (y + 1 <= 7 && x + 1 <= 9 && !grid[y + 1][x + 1]) { //right
+        moveableCoords.push([x + 1, y + 1])
+        if (this.firstMove && y + 2 >= 0 && x + 2 <= 9 && !grid[y + 2][x + 2]) {
+          moveableCoords.push([x + 2, y + 2])
+        }
+      }
+      if (y + 1 <= 7 && grid[y + 1][x] instanceof Piece && grid[y + 1][x].color != this.color) {
+        moveableCoords.push([x, y + 1])
+      }
+    }
+    return moveableCoords;
+  }
+}
