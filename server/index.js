@@ -25,7 +25,7 @@ wsServer.on('request', function (req) {
   var connectionID = ++currentID;
   var index = clients.push(connection) - 1;
 
-  users[connectionID] = {room: null, connection: connection}
+  users[connectionID] = {room: null, color: null, connection: connection}
 
   connection.on('message', function (message) {
     if (message.type === 'utf8') {
@@ -41,6 +41,12 @@ wsServer.on('request', function (req) {
           rooms[json.room].push(connectionID)
         }
         users[connectionID].room = json.room;
+        if (rooms[json.room].length == 1) {
+          users[connectionID].color = true;
+        } else if (rooms[json.room].length == 2) {
+          users[connectionID].color = !users[rooms[json.room][0]].color;
+        }
+        users[connectionID].connection.sendUTF(JSON.stringify({ type: 'color', color: users[connectionID].color }))
         console.log(rooms);
       } else if (json.type == "randomRoom") {
         for (const room in rooms) {

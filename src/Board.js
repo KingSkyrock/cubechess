@@ -27,7 +27,7 @@ export default class Board extends React.Component {
     this.colorInCheck = null;
 
     this.state = {
-      playerColor: Board.WHITE,
+      playerColor: null,
       turn: Board.WHITE,
       length: 700,
       x: 250,
@@ -167,32 +167,68 @@ export default class Board extends React.Component {
       this.canMoveToGrid.push([null, null, null, null, null, null, null, null, null, null]);
     }
 
-    this.grid[0][0] = new P.Mann(Board.BLACK);
-    this.grid[0][1] = new P.Rook(Board.BLACK);
-    this.grid[0][2] = new P.Knight(Board.BLACK);
-    this.grid[0][3] = new P.Bishop(Board.BLACK);
-    this.grid[0][4] = new P.Queen(Board.BLACK);
-    this.grid[0][5] = new P.King(Board.BLACK);
-    this.grid[0][6] = new P.Bishop(Board.BLACK);
-    this.grid[0][7] = new P.Knight(Board.BLACK);
-    this.grid[0][8] = new P.Rook(Board.BLACK);
-    this.grid[0][9] = new P.Mann(Board.BLACK);
-
-    this.grid[7][0] = new P.Mann(Board.WHITE);
-    this.grid[7][1] = new P.Rook(Board.WHITE);
-    this.grid[7][2] = new P.Knight(Board.WHITE);
-    this.grid[7][3] = new P.Bishop(Board.WHITE);
-    this.grid[7][4] = new P.Queen(Board.WHITE);
-    this.grid[7][5] = new P.King(Board.WHITE);
-    this.grid[7][6] = new P.Bishop(Board.WHITE);
-    this.grid[7][7] = new P.Knight(Board.WHITE);
-    this.grid[7][8] = new P.Rook(Board.WHITE);
-    this.grid[7][9] = new P.Mann(Board.WHITE);
+    var team = { color: Board.WHITE, row1: P.Pawn, row2: { c0: P.Mann, c1: P.Rook, c2: P.Knight, c3: P.Bishop, c4: P.Queen, }}
+    var enemyTeam = { color: Board.BLACK, row1: P.Pawn, row2: { c0: P.Mann, c1: P.Rook, c2: P.Knight, c3: P.Bishop, c4: P.Queen, } } //will be fetched from server
 
     for (var i = 0; i < 10; i++) {
-      this.grid[6][i] = new P.Pawn(Board.WHITE);
-      this.grid[1][i] = new P.Pawn(Board.BLACK);
+      if (team.color == Board.WHITE) {
+        this.grid[6][i] = new team.row1(Board.WHITE);
+      } else if (enemyTeam.color == Board.WHITE) {
+        this.grid[6][i] = new enemyTeam.row1(Board.WHITE);
+      }
+      if (team.color == Board.BLACK) {
+        this.grid[1][i] = new team.row1(Board.BLACK);
+      } else if (enemyTeam.color == Board.BLACK) {
+        this.grid[1][i] = new enemyTeam.row1(Board.BLACK);
+      }
     }
+
+    if (team.color == Board.WHITE) {
+      this.grid[7][0] = new team.row2.c0(Board.WHITE);
+      this.grid[7][1] = new team.row2.c1(Board.WHITE);
+      this.grid[7][2] = new team.row2.c2(Board.WHITE);
+      this.grid[7][3] = new team.row2.c3(Board.WHITE);
+      this.grid[7][4] = new team.row2.c4(Board.WHITE);
+      this.grid[7][6] = new team.row2.c3(Board.WHITE);
+      this.grid[7][7] = new team.row2.c2(Board.WHITE);
+      this.grid[7][8] = new team.row2.c1(Board.WHITE);
+      this.grid[7][9] = new team.row2.c0(Board.WHITE);
+    } else if (enemyTeam.color == Board.WHITE) {
+      this.grid[7][0] = new enemyTeam.row2.c0(Board.WHITE);
+      this.grid[7][1] = new enemyTeam.row2.c1(Board.WHITE);
+      this.grid[7][2] = new enemyTeam.row2.c2(Board.WHITE);
+      this.grid[7][3] = new enemyTeam.row2.c3(Board.WHITE);
+      this.grid[7][4] = new enemyTeam.row2.c4(Board.WHITE);
+      this.grid[7][6] = new enemyTeam.row2.c3(Board.WHITE);
+      this.grid[7][7] = new enemyTeam.row2.c2(Board.WHITE);
+      this.grid[7][8] = new enemyTeam.row2.c1(Board.WHITE);
+      this.grid[7][9] = new enemyTeam.row2.c0(Board.WHITE);
+    }
+    if (team.color == Board.BLACK) {
+      this.grid[0][0] = new team.row2.c0(Board.BLACK);
+      this.grid[0][1] = new team.row2.c1(Board.BLACK);
+      this.grid[0][2] = new team.row2.c2(Board.BLACK);
+      this.grid[0][3] = new team.row2.c3(Board.BLACK);
+      this.grid[0][4] = new team.row2.c4(Board.BLACK);
+      this.grid[0][6] = new team.row2.c3(Board.BLACK);
+      this.grid[0][7] = new team.row2.c2(Board.BLACK);
+      this.grid[0][8] = new team.row2.c1(Board.BLACK);
+      this.grid[0][9] = new team.row2.c0(Board.BLACK);
+    } else if (enemyTeam.color == Board.BLACK) {
+      this.grid[0][0] = new enemyTeam.row2.c0(Board.BLACK);
+      this.grid[0][1] = new enemyTeam.row2.c1(Board.BLACK);
+      this.grid[0][2] = new enemyTeam.row2.c2(Board.BLACK);
+      this.grid[0][3] = new enemyTeam.row2.c3(Board.BLACK);
+      this.grid[0][4] = new enemyTeam.row2.c4(Board.BLACK);
+      this.grid[0][6] = new enemyTeam.row2.c3(Board.BLACK);
+      this.grid[0][7] = new enemyTeam.row2.c2(Board.BLACK);
+      this.grid[0][8] = new enemyTeam.row2.c1(Board.BLACK);
+      this.grid[0][9] = new enemyTeam.row2.c0(Board.BLACK);
+    }
+
+    this.grid[0][5] = new P.King(Board.BLACK);
+    this.grid[7][5] = new P.King(Board.WHITE);
+
 
     this.calculateMovable(Board.WHITE);
     this.drawBoard();
@@ -217,6 +253,9 @@ export default class Board extends React.Component {
         this.canMoveToGrid = json.canMoveToGrid;
         this.grid = json.grid;
         this.setState({ turn: json.turn });
+        this.drawBoard();
+      } else if (json.type == 'color') {
+        this.setState({playerColor: json.color});
         this.drawBoard();
       }
     }
@@ -308,14 +347,12 @@ export default class Board extends React.Component {
       console.log("outside board");
     }
     this.drawBoard();
-  }
+  }             
 
   render() {
     return (
       <div>
         <canvas width="1000" height="900" onMouseDown={(e) => this.handleClick(this.canvas.current, e)} ref={this.canvas} className="game"></canvas>
-        <button onClick={() => this.setState({ playerColor: Board.WHITE }, () => this.drawBoard())}>white</button>
-        <button onClick={() => this.setState({ playerColor: Board.BLACK }, () => this.drawBoard())}>black</button>
       </div>
     )
   }
