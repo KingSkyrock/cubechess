@@ -159,7 +159,15 @@ export class Pawn extends Piece {
     return attacking;
   }
 
-  getMovement(x, y, grid) {
+  getEnPassant(x, y) {
+    if (this.color == Board.WHITE) {
+      return { color: Board.WHITE, coord: [x, y - 1], pieceCoord: [x, y - 2] };
+    } else if (this.color == Board.BLACK) {
+      return { color: Board.BLACK, coord: [x, y + 1], pieceCoord: [x, y + 2] };
+    }
+  }
+
+  getMovement(x, y, grid, enPassant) {
     var moveableCoords = [];
     if (this.color == Board.WHITE) {
       if (y - 1 >= 0 && !grid[y - 1][x]) {
@@ -168,10 +176,10 @@ export class Pawn extends Piece {
           moveableCoords.push([x, y - 2])
         }
       }
-      if (y - 1 >= 0 && x - 1 >= 0 && grid[y - 1][x - 1] instanceof Piece && grid[y - 1][x - 1].color != this.color) {
+      if (y - 1 >= 0 && x - 1 >= 0 && (grid[y - 1][x - 1] instanceof Piece && grid[y - 1][x - 1].color != this.color || enPassant && enPassant.coord[0] == x - 1 && enPassant.coord[1] == y - 1 && enPassant.color != this.color)) {
         moveableCoords.push([x - 1, y - 1])
       }
-      if (y - 1 >= 0 && x + 1 <= 9 && grid[y - 1][x + 1] instanceof Piece && grid[y - 1][x + 1].color != this.color) {
+      if (y - 1 >= 0 && x + 1 <= 9 && (grid[y - 1][x + 1] instanceof Piece && grid[y - 1][x + 1].color != this.color || enPassant && enPassant.coord[0] == x + 1 && enPassant.coord[1] == y - 1 && enPassant.color != this.color)) {
         moveableCoords.push([x + 1, y - 1])
       }
     } else if (this.color == Board.BLACK) {
@@ -181,10 +189,10 @@ export class Pawn extends Piece {
           moveableCoords.push([x, y + 2])
         }
       }
-      if (y + 1 <= 7 && x - 1 >= 0 && grid[y + 1][x - 1] instanceof Piece && grid[y + 1][x - 1].color != this.color) {
+      if (y + 1 <= 7 && x - 1 >= 0 && (grid[y + 1][x - 1] instanceof Piece && grid[y + 1][x - 1].color != this.color || enPassant && enPassant.coord[0] == x - 1 && enPassant.coord[1] == y + 1 && enPassant.color != this.color)) {
         moveableCoords.push([x - 1, y + 1])
       }
-      if (y + 1 <= 7 && x + 1 <= 9 && grid[y + 1][x + 1] instanceof Piece && grid[y + 1][x + 1].color != this.color) {
+      if (y + 1 <= 7 && x + 1 <= 9 && (grid[y + 1][x + 1] instanceof Piece && grid[y + 1][x + 1].color != this.color || enPassant && enPassant.coord[0] == x + 1 && enPassant.coord[1] == y + 1 && enPassant.color != this.color)) {
         moveableCoords.push([x + 1, y + 1])
       }
     }
@@ -487,7 +495,23 @@ export class AntiPawn extends Pawn {
     return attacking;
   }
 
-  getMovement(x, y, grid) {
+  getEnPassant(x, y, newX) {
+    if (this.color == Board.WHITE) {
+      if (newX > x) {
+        return { color: Board.WHITE, coord: [x + 1, y - 1], pieceCoord: [x + 2, y - 2] }
+      } else {
+        return { color: Board.WHITE, coord: [x - 1, y - 1], pieceCoord: [x - 2, y - 2] }
+      }
+    } else if (this.color == Board.BLACK) {
+      if (newX > x) {
+        return { color: Board.BLACK, coord: [x + 1, y + 1], pieceCoord: [x + 2, y + 2] }
+      } else {
+        return { color: Board.BLACK, coord: [x - 1, y + 1], pieceCoord: [x - 2, y + 2] }
+      }
+    }
+  }
+
+  getMovement(x, y, grid, enPassant) {
     var moveableCoords = [];
     if (this.color == Board.WHITE) {
       if (y - 1 >= 0 && x - 1 >= 0 && !grid[y - 1][x - 1]) { //left
@@ -502,7 +526,7 @@ export class AntiPawn extends Pawn {
           moveableCoords.push([x + 2, y - 2])
         }
       }
-      if (y - 1 >= 0 && grid[y - 1][x] instanceof Piece && grid[y - 1][x].color != this.color) {
+      if (y - 1 >= 0 && (grid[y - 1][x] instanceof Piece && grid[y - 1][x].color != this.color || enPassant && enPassant.coord[0] == x && enPassant.coord[1] == y - 1 && enPassant.color != this.color)) {
         moveableCoords.push([x, y - 1])
       }
     } else if (this.color == Board.BLACK) {
@@ -518,7 +542,7 @@ export class AntiPawn extends Pawn {
           moveableCoords.push([x + 2, y + 2])
         }
       }
-      if (y + 1 <= 7 && grid[y + 1][x] instanceof Piece && grid[y + 1][x].color != this.color) {
+      if (y + 1 <= 7 && (grid[y + 1][x] instanceof Piece && grid[y + 1][x].color != this.color || enPassant && enPassant.coord[0] == x && enPassant.coord[1] == y + 1 && enPassant.color != this.color)) {
         moveableCoords.push([x, y + 1])
       }
     }

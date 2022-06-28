@@ -169,8 +169,8 @@ export default class Board extends React.Component {
       this.canMoveToGrid.push([null, null, null, null, null, null, null, null, null, null]);
     }
 
-    var team = { color: Board.WHITE, row1: P.Pawn, row2: { c0: P.Mann, c1: P.Rook, c2: P.Knight, c3: P.Bishop, c4: P.Queen, }}
-    var enemyTeam = { color: Board.BLACK, row1: P.Pawn, row2: { c0: P.Mann, c1: P.Rook, c2: P.Knight, c3: P.Bishop, c4: P.Queen, } } //will be fetched from server
+    var team = { color: Board.WHITE, row1: P.AntiPawn, row2: { c0: P.Mann, c1: P.Rook, c2: P.Knight, c3: P.Bishop, c4: P.Queen, }}
+    var enemyTeam = { color: Board.BLACK, row1: P.AntiPawn, row2: { c0: P.Mann, c1: P.Rook, c2: P.Knight, c3: P.Bishop, c4: P.Queen, } } //will be fetched from server
 
     for (var i = 0; i < 10; i++) {
       if (team.color == Board.WHITE) {
@@ -253,6 +253,7 @@ export default class Board extends React.Component {
           }
         }
         this.canMoveToGrid = json.canMoveToGrid;
+        this.enPassant = json.enPassant;
         this.grid = json.grid;
         this.setState({ turn: json.turn });
         this.drawBoard();
@@ -280,7 +281,7 @@ export default class Board extends React.Component {
     for (var i = 0; i < this.grid.length; i++) {
       for (var j = 0; j < this.grid[i].length; j++) {
         if (this.grid[i][j] instanceof P.Piece && this.grid[i][j].color == color) {
-          var canMoveTo = this.grid[i][j].getMovement(j, i, this.grid);
+          var canMoveTo = this.grid[i][j].getMovement(j, i, this.grid, this.enPassant);
           for (var k = canMoveTo.length - 1; k >= 0; k--) {
             var newArray = this.grid.map((arr) => {
               return arr.slice();
@@ -311,11 +312,22 @@ export default class Board extends React.Component {
       } else if (this.selected != null) {
         for (var i of this.canMoveTo) {
           if (i[0] == box[0] && i[1] == box[1]) {
-            if (this.grid[this.selected[1]][this.selected[0]] instanceof P.Pawn) {
-              this.grid[this.selected[1]][this.selected[0]].firstMove = false;
+            if (this.enPassant && this.enPassant.coord[0] == box[0] && this.enPassant.coord[1] == box[1]) { //if move is en passant
+              this.grid[this.enPassant.pieceCoord[1]][this.enPassant.pieceCoord[0]] = null;
             }
             this.grid[box[1]][box[0]] = this.grid[this.selected[1]][this.selected[0]];
             this.grid[this.selected[1]][this.selected[0]] = null;
+            
+            this.enPassant = null;
+            if (this.grid[box[1]][box[0]] instanceof P.Pawn) {
+              if (this.grid[box[1]][box[0]].firstMove && !(this.grid[box[1]][box[0]] instanceof P.AntiPawn)) {
+                this.enPassant = this.grid[box[1]][box[0]].getEnPassant(this.selected[0], this.selected[1]);
+              } else if (this.grid[box[1]][box[0]].firstMove) {
+                this.enPassant = this.grid[box[1]][box[0]].getEnPassant(this.selected[0], this.selected[1], box[0]);
+              }
+              this.grid[box[1]][box[0]].firstMove = false;
+            }
+
             this.selected = null;
             this.canMoveTo = null;
             this.setState({ turn: !this.state.turn }, () => {
@@ -338,6 +350,7 @@ export default class Board extends React.Component {
                 type: 'moved',
                 grid: this.grid,
                 canMoveToGrid: this.canMoveToGrid, 
+                enPassant: this.enPassant,
                 turn: this.state.turn, 
                 room: window.location.pathname 
               }));
@@ -355,6 +368,8 @@ export default class Board extends React.Component {
     return (
       <div>
         <canvas width="1000" height="900" onMouseDown={(e) => this.handleClick(this.canvas.current, e)} ref={this.canvas} className="game"></canvas>
+        <button onClick={() => this.setState({ playerColor: Board.WHITE }, () => this.drawBoard())}>white</button>
+        <button onClick={() => this.setState({ playerColor: Board.BLACK }, () => this.drawBoard())}>black</button>
       </div>
     )
   }

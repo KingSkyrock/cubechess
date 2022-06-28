@@ -32,7 +32,7 @@ wsServer.on('request', function (req) {
       var json = JSON.parse(message.utf8Data);
       if (json.type == "moved") {
         for (var x of rooms[json.room]) {
-          users[x].connection.sendUTF(JSON.stringify({ type: 'boardUpdate', grid: json.grid, canMoveToGrid: json.canMoveToGrid, turn: json.turn }));
+          users[x].connection.sendUTF(JSON.stringify({ type: 'boardUpdate', grid: json.grid, canMoveToGrid: json.canMoveToGrid, enPassant: json.enPassant, turn: json.turn }));
         }
       } else if (json.type == "joinRoom") {
         if (rooms[json.room] == undefined) {
