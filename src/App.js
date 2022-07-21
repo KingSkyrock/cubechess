@@ -40,8 +40,8 @@ export default class App extends React.Component {
       posY: [[null, null, null, null], [null, null, null, null], [null, null, null, null], [null, null, null, null]],
       negY: [[null, null, null, null], [null, null, null, null], [null, null, null, null], [null, null, null, null]],
       posX: [[null, null, null, null], [null, null, null, null], [null, null, null, null], [null, null, null, null]],
-      negX: [[null, null, null, null], [null, null, null, null], [null, null, null, null], [null, null, null, null]],
-      posZ: [[null, null, null, null], [null, null, new P.Rook(true), null], [null, null, null, null], [null, null, null, null]],
+      negX: [[null, null, null, null], [null, new P.Rook(true), null, null], [null, null, null, null], [null, null, null, null]],
+      posZ: [[null, null, null, null], [null, null, null, null], [null, null, null, null], [null, null, null, null]],
       negZ: [[null, null, null, null], [null, null, null, null], [null, null, null, null], [null, null, null, null]]
     };
 
@@ -67,7 +67,7 @@ export default class App extends React.Component {
               this.pieceGeometries[side][i][j].position.set(-101, 75 - 50 * i, -75 + 50 * j);
               this.pieceGeometries[side][i][j].rotation.y = Math.PI / 2;
             } else if (side == "posY") {
-              this.pieceGeometries[side][i][j].position.set(-75 + 50 * j, 101, 75 - 50 * i);
+              this.pieceGeometries[side][i][j].position.set(-75 + 50 * j, 101, -75 + 50 * i);
               this.pieceGeometries[side][i][j].rotation.x = Math.PI / 2;
             } else if (side == "negY") {
               this.pieceGeometries[side][i][j].position.set(-75 + 50 * j, -101, 75 - 50 * i);
@@ -84,6 +84,8 @@ export default class App extends React.Component {
     window.addEventListener('mousemove', evt => this.onMouseMove(evt));
     window.addEventListener('mousedown', evt => this.onMouseDown(evt));
     window.addEventListener('resize', evt => this.onResize(evt));
+
+    this.moveable = this.board["negX"][1][1].getMovement("negX", 1, 1, this.board)
 
     this.scene = new THREE.Scene();
 
@@ -124,7 +126,7 @@ export default class App extends React.Component {
             this.cubeSidesGeometries[side][i][j].position.set(-100, 75 - 50 * i, -75 + 50 * j);
             this.cubeSidesGeometries[side][i][j].rotation.y = Math.PI / 2;
           } else if (side == "posY") {
-            this.cubeSidesGeometries[side][i][j].position.set(-75 + 50 * j, 100, 75 - 50 * i);
+            this.cubeSidesGeometries[side][i][j].position.set(-75 + 50 * j, 100, -75 + 50 * i);
             this.cubeSidesGeometries[side][i][j].rotation.x = Math.PI / 2;
           } else if (side == "negY") {
             this.cubeSidesGeometries[side][i][j].position.set(-75 + 50 * j, -100, 75 - 50 * i);
@@ -207,6 +209,11 @@ export default class App extends React.Component {
           }
         }
       }
+      for (var [side, arr] of Object.entries(this.moveable)) {
+        for (var i in arr) {
+          this.cubeSidesGeometries[side][arr[i][1]][arr[i][0]].material.color.set(0x00FF00);
+        }
+      }
     }
   }
 
@@ -235,7 +242,7 @@ export default class App extends React.Component {
 
   getSideColor(i, j, side) {
     var color;
-    if (side == "posX" || side == "negX" || side == "negY") {
+    if (side == "posX" || side == "negX" || side == "negY" || side == "posY") {
       if (i % 2) {
         if (j % 2) {
           color = 0xc6a27e;
@@ -249,7 +256,7 @@ export default class App extends React.Component {
           color = 0xc6a27e;
         }
       }
-    } else if (side == "posZ" || side == "negZ" || side == "posY") {
+    } else if (side == "posZ" || side == "negZ") {
       if (i % 2) {
         if (j % 2) {
           color = 0xf8dfa1;
