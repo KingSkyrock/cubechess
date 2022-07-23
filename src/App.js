@@ -19,6 +19,9 @@ export default class App extends React.Component {
     this.mouse;
     this.raycaster;
     this.plane;
+
+    this
+
     this.cubeSidesGeometries = {
       posY: [[null, null, null, null], [null, null, null, null], [null, null, null, null], [null, null, null, null]],
       negY: [[null, null, null, null], [null, null, null, null], [null, null, null, null], [null, null, null, null]],
@@ -51,6 +54,15 @@ export default class App extends React.Component {
   };
 
   createPieces() {
+    for (var [side, arr] of Object.entries(this.pieceGeometries)) {
+      for (var i in arr) {
+        for (var j in arr[i]) {
+          if (this.pieceGeometries[side][i][j] instanceof THREE.Mesh) {
+            this.scene.remove(this.pieceGeometries[side][i][j]);
+          }
+        }
+      }
+    }
     for (var [side, arr] of Object.entries(this.board)) {
       for (var i in arr) {
         for (var j in arr[i]) {
@@ -73,6 +85,7 @@ export default class App extends React.Component {
               this.pieceGeometries[side][i][j].position.set(-75 + 50 * j, -101, 75 - 50 * i);
               this.pieceGeometries[side][i][j].rotation.x = Math.PI / 2;
             }
+            this.pieceGeometries[side][i][j].piece = true;
             this.scene.add(this.pieceGeometries[side][i][j]);
           }
         }
@@ -205,6 +218,16 @@ export default class App extends React.Component {
           for (var j in arr[i]) {
             if (intersects[0].object.uuid == this.cubeSidesGeometries[side][i][j].uuid) {
               intersects[0].object.material.color.set(0x156289)
+            } else if (intersects[0].object.piece) {
+              for (var [side, arr] of Object.entries(this.pieceGeometries)) {
+                for (var i in arr) {
+                  for (var j in arr[i]) {
+                    if (this.pieceGeometries[side][i][j] && intersects[0].object.uuid == this.pieceGeometries[side][i][j].uuid) {
+                      this.cubeSidesGeometries[side][i][j].material.color.set(0x156289)
+                    }
+                  }
+                }
+              }
             }
           }
         }
@@ -233,6 +256,17 @@ export default class App extends React.Component {
             if (intersects[0].object.uuid == this.cubeSidesGeometries[side][i][j].uuid) {
               console.log(side)
               console.log(j + ", " + i)
+            } else if (intersects[0].object.piece) {
+              for (var [side, arr] of Object.entries(this.pieceGeometries)) {
+                for (var i in arr) {
+                  for (var j in arr[i]) {
+                    if (this.pieceGeometries[side][i][j] && intersects[0].object.uuid == this.pieceGeometries[side][i][j].uuid) {
+                      console.log(side)
+                      console.log(j + ", " + i)
+                    }
+                  }
+                }
+              }
             }
           }
         }
