@@ -20,7 +20,9 @@ export default class App extends React.Component {
     this.raycaster;
     this.plane;
 
-    this
+    this.selected = null;
+    this.canMoveTo = [];
+    //this.canMoveToGrid;
 
     this.cubeSidesGeometries = {
       posY: [[null, null, null, null], [null, null, null, null], [null, null, null, null], [null, null, null, null]],
@@ -43,7 +45,7 @@ export default class App extends React.Component {
       posY: [[null, null, null, null], [null, null, null, null], [null, null, null, null], [null, null, null, null]],
       negY: [[null, null, null, null], [null, null, null, null], [null, null, null, null], [null, null, null, null]],
       posX: [[null, null, null, null], [null, null, null, null], [null, null, null, null], [null, null, null, null]],
-      negX: [[null, null, null, null], [null, new P.Rook(true), null, null], [null, null, null, null], [null, null, null, null]],
+      negX: [[null, null, null, null], [null, new P.Rook(P.WHITE), null, null], [null, null, null, null], [null, null, null, null]],
       posZ: [[null, null, null, null], [null, null, null, null], [null, null, null, null], [null, null, null, null]],
       negZ: [[null, null, null, null], [null, null, null, null], [null, null, null, null], [null, null, null, null]]
     };
@@ -67,7 +69,13 @@ export default class App extends React.Component {
       for (var i in arr) {
         for (var j in arr[i]) {
           if (this.board[side][i][j] instanceof P.Rook) {
-            this.pieceGeometries[side][i][j] = new THREE.Mesh(new THREE.PlaneGeometry(25, 25), new THREE.MeshPhongMaterial({ color: 0x000000, emissive: 0x000000, side: THREE.DoubleSide, flatShading: true }));
+            var color;
+            if (this.board[side][i][j].color == P.WHITE) {
+              color = 0xFFFFFF;
+            } else {
+              color = 0x000000;
+            }
+            this.pieceGeometries[side][i][j] = new THREE.Mesh(new THREE.PlaneGeometry(25, 25), new THREE.MeshPhongMaterial({ color: color, emissive: 0x000000, side: THREE.DoubleSide, flatShading: true }));
             if (side == "posZ") {
               this.pieceGeometries[side][i][j].position.set(-75 + 50 * j, 75 - 50 * i, 101);
             } else if (side == "negZ") {
@@ -97,8 +105,6 @@ export default class App extends React.Component {
     window.addEventListener('mousemove', evt => this.onMouseMove(evt));
     window.addEventListener('mousedown', evt => this.onMouseDown(evt));
     window.addEventListener('resize', evt => this.onResize(evt));
-
-    this.moveable = this.board["negX"][1][1].getMovement("negX", 1, 1, this.board)
 
     this.scene = new THREE.Scene();
 
@@ -176,7 +182,6 @@ export default class App extends React.Component {
     this.raycaster = new THREE.Raycaster();
     this.mouse = new THREE.Vector2();
 
-
     this.renderThreeJS();
   }
 
@@ -184,7 +189,8 @@ export default class App extends React.Component {
     this.renderer.render(this.scene, this.camera);
     this.controls.update();
     requestAnimationFrame(this.renderThreeJS.bind(this));
-    //this.createPieces();
+
+    this.createPieces();
   }
 
   onResize(evt) {
@@ -203,14 +209,8 @@ export default class App extends React.Component {
     this.raycaster.setFromCamera(this.mouse, this.camera);
 
     var intersects = this.raycaster.intersectObject(this.scene, true);
-
-    for (var [side, arr] of Object.entries(this.cubeSidesGeometries)) {
-      for (var i in arr) {
-        for (var j in arr[i]) {
-          this.cubeSidesGeometries[side][i][j].material.color.set(this.getSideColor(i, j, side));
-        }
-      }
-    }
+    
+    this.updateSideColors();
 
     if (intersects.length > 0) {
       for (var [side, arr] of Object.entries(this.cubeSidesGeometries)) {
@@ -218,23 +218,10 @@ export default class App extends React.Component {
           for (var j in arr[i]) {
             if (intersects[0].object.uuid == this.cubeSidesGeometries[side][i][j].uuid) {
               intersects[0].object.material.color.set(0x156289)
-            } else if (intersects[0].object.piece) {
-              for (var [side, arr] of Object.entries(this.pieceGeometries)) {
-                for (var i in arr) {
-                  for (var j in arr[i]) {
-                    if (this.pieceGeometries[side][i][j] && intersects[0].object.uuid == this.pieceGeometries[side][i][j].uuid) {
-                      this.cubeSidesGeometries[side][i][j].material.color.set(0x156289)
-                    }
-                  }
-                }
-              }
+            } else if (intersects[0].object.piece && this.pieceGeometries[side][i][j] && intersects[0].object.uuid == this.pieceGeometries[side][i][j].uuid) {
+              this.cubeSidesGeometries[side][i][j].material.color.set(0x156289)
             }
           }
-        }
-      }
-      for (var [side, arr] of Object.entries(this.moveable)) {
-        for (var i in arr) {
-          this.cubeSidesGeometries[side][arr[i][1]][arr[i][0]].material.color.set(0x00FF00);
         }
       }
     }
@@ -254,21 +241,47 @@ export default class App extends React.Component {
         for (var i in arr) {
           for (var j in arr[i]) {
             if (intersects[0].object.uuid == this.cubeSidesGeometries[side][i][j].uuid) {
-              console.log(side)
-              console.log(j + ", " + i)
-            } else if (intersects[0].object.piece) {
-              for (var [side, arr] of Object.entries(this.pieceGeometries)) {
-                for (var i in arr) {
-                  for (var j in arr[i]) {
-                    if (this.pieceGeometries[side][i][j] && intersects[0].object.uuid == this.pieceGeometries[side][i][j].uuid) {
-                      console.log(side)
-                      console.log(j + ", " + i)
-                    }
-                  }
-                }
-              }
+              this.handleClick(side, j, i);
+            } else if (intersects[0].object.piece && this.pieceGeometries[side][i][j] && intersects[0].object.uuid == this.pieceGeometries[side][i][j].uuid) {
+              this.handleClick(side, j, i);
             }
           }
+        }
+      }
+    }
+  }
+
+  handleClick(side, x, y) {
+    if (this.board[side][y][x] instanceof P.Piece) {
+      this.selected = {side: side, x: x, y: y};
+      this.canMoveTo = this.board[side][y][x].getMovement(side, x, y, this.board);
+    } else if (this.selected != null) {
+      for (var [side2, arr] of Object.entries(this.canMoveTo)) {
+        var moved;
+        for (var i in arr) {
+          if (side2 == side && arr[i][1] == y && arr[i][0] == x) {
+            this.board[side][y][x] = this.board[this.selected.side][this.selected.y][this.selected.x];
+            this.board[this.selected.side][this.selected.y][this.selected.x] = null;
+            this.selected = null;
+            this.canMoveTo = null;
+
+            moved = true;
+            break;
+          }
+        }
+        if (moved) break;
+      }
+    } else {
+      this.selected = null;
+    }
+    this.updateSideColors();
+  }
+
+  updateSideColors() {
+    for (var [side, arr] of Object.entries(this.cubeSidesGeometries)) {
+      for (var i in arr) {
+        for (var j in arr[i]) {
+          this.cubeSidesGeometries[side][i][j].material.color.set(this.getSideColor(i, j, side));
         }
       }
     }
@@ -305,6 +318,17 @@ export default class App extends React.Component {
         }
       }
     }
+
+    if (this.canMoveTo != null) {
+      for (var [side2, arr] of Object.entries(this.canMoveTo)) {
+        for (var c of arr) {
+          if (side == side2 && c[0] == j && c[1] == i) {
+            color = 0x00FF00;
+          }
+        }
+      }
+    }
+    
     
     return color;
   }

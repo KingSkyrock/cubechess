@@ -1,3 +1,6 @@
+
+export const WHITE = true;
+export const BLACK = false;
 export class Piece {
   constructor(color) {
     this.color = color;
@@ -21,6 +24,8 @@ export class Rook extends Piece {
   }
 
   movementCalculator(dir, swapX, swapY, x, y, side, board) {
+    y = parseInt(y);
+    x = parseInt(x);
     if (dir == "up") {
       if (y != 0 && !board[side][y - 1][x]) {
         y--;
@@ -28,7 +33,7 @@ export class Rook extends Piece {
         side = connectingSides[side].up;
         y = swapY;
         x = swapX;
-      } else if ((board[side][y - 1][x])) {
+      } else if (board[side][y - 1] && board[side][y - 1][x]) {
         return false;
       } else {
         return false;
@@ -40,7 +45,7 @@ export class Rook extends Piece {
         side = connectingSides[side].down;
         y = swapY;
         x = swapX;
-      } else if ((board[side][y + 1][x])) {
+      } else if (board[side][y + 1] && board[side][y + 1][x]) {
         return false;
       } else {
         return false;
@@ -52,7 +57,7 @@ export class Rook extends Piece {
         side = connectingSides[side].left;
         y = swapY;
         x = swapX;
-      } else if ((board[side][y][x - 1])) {
+      } else if (board[side][y][x - 1]) {
         return false;
       } else {
         return false;
@@ -64,7 +69,7 @@ export class Rook extends Piece {
         side = connectingSides[side].right;
         y = swapY;
         x = swapX;
-      } else if ((board[side][y][x + 1])) {
+      } else if (board[side][y][x + 1]) {
         return false;
       } else {
         return false;
