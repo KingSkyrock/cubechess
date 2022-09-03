@@ -20,6 +20,9 @@ export default class App extends React.Component {
     this.raycaster;
     this.plane;
 
+    this.turn = P.WHITE;
+    this.playerColor = P.WHITE;
+
     this.selected = null;
     this.canMoveTo = [];
     //this.canMoveToGrid;
@@ -45,14 +48,12 @@ export default class App extends React.Component {
       posY: [[null, null, null, null], [null, null, null, null], [null, null, null, null], [null, null, null, null]],
       negY: [[null, null, null, null], [null, null, null, null], [null, null, null, null], [null, null, null, null]],
       posX: [[null, null, null, null], [null, null, null, null], [null, null, null, null], [null, null, null, null]],
-      negX: [[null, null, null, null], [null, new P.Rook(P.WHITE), null, null], [null, null, null, null], [null, null, null, null]],
-      posZ: [[null, null, null, null], [null, null, null, null], [null, null, null, null], [null, null, null, null]],
+      negX: [[null, null, null, null], [null, new P.Queen(P.WHITE), null, null], [null, null, null, null], [null, null, null, null]],
+      posZ: [[null, null, null, null], [null, null, null, null], [null, new P.Bishop(P.BLACK), null, null], [null, null, null, null]],
       negZ: [[null, null, null, null], [null, null, null, null], [null, null, null, null], [null, null, null, null]]
     };
 
-    this.state = {
-
-    }
+    this.state = {}
   };
 
   createPieces() {
@@ -68,7 +69,7 @@ export default class App extends React.Component {
     for (var [side, arr] of Object.entries(this.board)) {
       for (var i in arr) {
         for (var j in arr[i]) {
-          if (this.board[side][i][j] instanceof P.Rook) {
+          if (this.board[side][i][j] instanceof P.Piece) {
             var color;
             if (this.board[side][i][j].color == P.WHITE) {
               color = 0xFFFFFF;
@@ -189,8 +190,6 @@ export default class App extends React.Component {
     this.renderer.render(this.scene, this.camera);
     this.controls.update();
     requestAnimationFrame(this.renderThreeJS.bind(this));
-
-    this.createPieces();
   }
 
   onResize(evt) {
@@ -252,7 +251,7 @@ export default class App extends React.Component {
   }
 
   handleClick(side, x, y) {
-    if (this.board[side][y][x] instanceof P.Piece) {
+    if (this.board[side][y][x] instanceof P.Piece && this.board[side][y][x].color == this.playerColor && this.turn == this.playerColor) {
       this.selected = {side: side, x: x, y: y};
       this.canMoveTo = this.board[side][y][x].getMovement(side, x, y, this.board);
     } else if (this.selected != null) {
@@ -269,7 +268,12 @@ export default class App extends React.Component {
             break;
           }
         }
-        if (moved) break;
+        if (moved) {
+          this.createPieces();
+          this.turn = !this.turn;
+          this.playerColor = !this.playerColor; //temporary
+          break;
+        }
       }
     } else {
       this.selected = null;
