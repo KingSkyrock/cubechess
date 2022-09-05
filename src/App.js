@@ -47,10 +47,10 @@ export default class App extends React.Component {
     this.board = {
       posY: [[null, null, null, null], [null, null, null, null], [null, null, null, null], [null, null, null, null]],
       negY: [[null, null, null, null], [null, null, null, null], [null, null, null, null], [null, null, null, null]],
-      posX: [[null, null, null, null], [null, null, null, null], [null, null, null, null], [null, null, null, null]],
+      posX: [[null, null, null, null], [null, null, null, null], [null, null, new P.Rook(P.WHITE), null], [null, null, null, null]],
       negX: [[null, null, null, null], [null, new P.Queen(P.WHITE), null, null], [null, null, null, null], [null, null, null, null]],
-      posZ: [[null, null, null, null], [null, null, null, null], [null, new P.Bishop(P.BLACK), null, null], [null, null, null, null]],
-      negZ: [[null, null, null, null], [null, null, null, null], [null, null, null, null], [null, null, null, null]]
+      posZ: [[null, null, null, null], [null, null, null, null], [null, new P.Knight(P.BLACK), null, null], [null, null, null, null]],
+      negZ: [[null, null, null, null], [null, null, null, null], [new P.Bishop(P.BLACK), null, null, null], [null, null, null, null]]
     };
 
     this.state = {}
@@ -241,8 +241,10 @@ export default class App extends React.Component {
           for (var j in arr[i]) {
             if (intersects[0].object.uuid == this.cubeSidesGeometries[side][i][j].uuid) {
               this.handleClick(side, j, i);
+              console.log(side + ", " + j + ", " + i)
             } else if (intersects[0].object.piece && this.pieceGeometries[side][i][j] && intersects[0].object.uuid == this.pieceGeometries[side][i][j].uuid) {
               this.handleClick(side, j, i);
+              console.log(side + ", " + j + ", " + i)
             }
           }
         }
