@@ -4,6 +4,8 @@ import './styles.scss';
 import * as THREE from 'three';
 import { TrackballControls } from "three/examples/jsm/controls/TrackballControls";
 import * as P from './Pieces';
+import { OBJLoader } from 'three/examples/jsm/loaders/OBJLoader.js';
+import { object } from 'prop-types';
 
 export default class App extends React.Component {
 
@@ -70,12 +72,41 @@ export default class App extends React.Component {
       for (var i in arr) {
         for (var j in arr[i]) {
           if (this.board[side][i][j] instanceof P.Piece) {
+            const loader = new OBJLoader(new THREE.LoadingManager());
             var color;
             if (this.board[side][i][j].color == P.WHITE) {
               color = 0xFFFFFF;
             } else {
               color = 0x000000;
             }
+
+            loader.load('/assets/Bishop.obj', (obj) => {
+              if (side == "posZ") {
+                obj.position.set(-75 + 50 * j, 75 - 50 * i, 101);
+              } else if (side == "negZ") {
+                obj.position.set(75 - 50 * j, 75 - 50 * i, -101);
+              } else if (side == "posX") {
+                obj.position.set(101, 75 - 50 * i, 75 - 50 * j);
+                obj.rotation.y = Math.PI / 2;
+              } else if (side == "negX") {
+                obj.position.set(-101, 75 - 50 * i, -75 + 50 * j);
+                obj.rotation.y = Math.PI / 2;
+              } else if (side == "posY") {
+                obj.position.set(-75 + 50 * j, 101, -75 + 50 * i);
+                obj.rotation.x = Math.PI / 2;
+              } else if (side == "negY") {
+                obj.position.set(-75 + 50 * j, -101, 75 - 50 * i);
+                obj.rotation.x = Math.PI / 2;
+              }
+              obj.traverse((child) => {
+                if (child instanceof THREE.Mesh) {
+                  child.material = new THREE.MeshPhongMaterial({ color: color, emissive: 0x000000, side: THREE.DoubleSide, flatShading: true });
+                }
+              });
+              obj.scale.set(1000, 1000, 1000)
+              obj.piece = true;
+              this.scene.add(obj);
+            });
             this.pieceGeometries[side][i][j] = new THREE.Mesh(new THREE.PlaneGeometry(25, 25), new THREE.MeshPhongMaterial({ color: color, emissive: 0x000000, side: THREE.DoubleSide, flatShading: true }));
             if (side == "posZ") {
               this.pieceGeometries[side][i][j].position.set(-75 + 50 * j, 75 - 50 * i, 101);

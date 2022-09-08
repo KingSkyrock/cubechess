@@ -7,7 +7,9 @@ const webSocketServer = require('websocket').server;
 const app = express();
 const port = process.env.PORT || 3000;
 const DIST_DIR = path.join(__dirname, '../dist');
+const ASSETS_DIR = path.join(__dirname, '../assets');
 const HTML_FILE = path.join(DIST_DIR, 'index.html');
+
 
 var server = http.createServer(app);
 
@@ -75,12 +77,12 @@ wsServer.on('request', function (req) {
   });
 });
 
+app.use('/assets', express.static(ASSETS_DIR));
 app.use(express.static(DIST_DIR));
 
 app.get('*', (req, res) => {
  res.sendFile(HTML_FILE);
 });
-
 
 server.listen(port, function () {
   console.log('Websocket listening on port: ' + port);
