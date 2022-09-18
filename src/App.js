@@ -22,6 +22,13 @@ export default class App extends React.Component {
     this.raycaster;
     this.plane;
 
+    this.bishop;
+    this.queen;
+    this.rook;
+    this.king;
+    this.pawn;
+    this.knight;
+
     this.turn = P.WHITE;
     this.playerColor = P.WHITE;
 
@@ -50,7 +57,7 @@ export default class App extends React.Component {
       posY: [[null, null, null, null], [null, null, null, null], [null, null, null, null], [null, null, null, null]],
       negY: [[null, null, null, null], [null, null, null, null], [null, null, null, null], [null, null, null, null]],
       posX: [[null, null, null, null], [null, null, null, null], [null, null, new P.Rook(P.WHITE), null], [null, null, null, null]],
-      negX: [[null, null, null, null], [null, new P.Queen(P.WHITE), null, null], [null, null, null, null], [null, null, null, null]],
+      negX: [[null, null, null, null], [null, new P.Queen(P.WHITE), new P.Queen(P.WHITE), null], [null, null, null, null], [null, null, null, null]],
       posZ: [[null, null, null, null], [null, null, null, null], [null, new P.Knight(P.BLACK), null, null], [null, null, null, null]],
       negZ: [[null, null, null, null], [null, null, null, null], [new P.Bishop(P.BLACK), null, null, null], [null, null, null, null]]
     };
@@ -58,11 +65,42 @@ export default class App extends React.Component {
     this.state = {}
   };
 
+  addPiece(piece, side, i, j, color) {
+    var obj = this[piece].clone()
+    this.pieceGeometries[side][i][j] = obj;
+    if (side == "posZ") {
+      this.pieceGeometries[side][i][j].position.set(-75 + 50 * j, 75 - 50 * i, 101);
+      this.pieceGeometries[side][i][j].rotation.y = Math.PI;
+    } else if (side == "negZ") {
+      this.pieceGeometries[side][i][j].position.set(75 - 50 * j, 75 - 50 * i, -101);
+    } else if (side == "posX") {
+      this.pieceGeometries[side][i][j].position.set(101, 75 - 50 * i, 75 - 50 * j);
+      this.pieceGeometries[side][i][j].rotation.y = - Math.PI / 2;
+    } else if (side == "negX") {
+      this.pieceGeometries[side][i][j].position.set(-101, 75 - 50 * i, -75 + 50 * j);
+      this.pieceGeometries[side][i][j].rotation.y = Math.PI / 2;
+    } else if (side == "posY") {
+      this.pieceGeometries[side][i][j].position.set(-75 + 50 * j, 101, -75 + 50 * i);
+      this.pieceGeometries[side][i][j].rotation.x = Math.PI / 2;
+    } else if (side == "negY") {
+      this.pieceGeometries[side][i][j].position.set(-75 + 50 * j, -101, 75 - 50 * i);
+      this.pieceGeometries[side][i][j].rotation.x = - Math.PI / 2;
+    }
+    this.pieceGeometries[side][i][j].traverse((child) => {
+      if (child instanceof THREE.Mesh) {
+        child.material = new THREE.MeshPhongMaterial({ color: color, emissive: 0x000000, side: THREE.DoubleSide, flatShading: true });
+      }
+    });
+    this.pieceGeometries[side][i][j].scale.set(1000, 1000, 1000)
+    this.pieceGeometries[side][i][j].piece = true;
+    this.scene.add(this.pieceGeometries[side][i][j]);
+  }
+
   createPieces() {
     for (var [side, arr] of Object.entries(this.pieceGeometries)) {
       for (var i in arr) {
         for (var j in arr[i]) {
-          if (this.pieceGeometries[side][i][j] instanceof THREE.Mesh) {
+          if (this.pieceGeometries[side][i][j] != null) {
             this.scene.remove(this.pieceGeometries[side][i][j]);
           }
         }
@@ -72,7 +110,6 @@ export default class App extends React.Component {
       for (var i in arr) {
         for (var j in arr[i]) {
           if (this.board[side][i][j] instanceof P.Piece) {
-            const loader = new OBJLoader(new THREE.LoadingManager());
             var color;
             if (this.board[side][i][j].color == P.WHITE) {
               color = 0xFFFFFF;
@@ -80,53 +117,15 @@ export default class App extends React.Component {
               color = 0x000000;
             }
 
-            loader.load('/assets/Bishop.obj', (obj) => {
-              if (side == "posZ") {
-                obj.position.set(-75 + 50 * j, 75 - 50 * i, 101);
-              } else if (side == "negZ") {
-                obj.position.set(75 - 50 * j, 75 - 50 * i, -101);
-              } else if (side == "posX") {
-                obj.position.set(101, 75 - 50 * i, 75 - 50 * j);
-                obj.rotation.y = Math.PI / 2;
-              } else if (side == "negX") {
-                obj.position.set(-101, 75 - 50 * i, -75 + 50 * j);
-                obj.rotation.y = Math.PI / 2;
-              } else if (side == "posY") {
-                obj.position.set(-75 + 50 * j, 101, -75 + 50 * i);
-                obj.rotation.x = Math.PI / 2;
-              } else if (side == "negY") {
-                obj.position.set(-75 + 50 * j, -101, 75 - 50 * i);
-                obj.rotation.x = Math.PI / 2;
-              }
-              obj.traverse((child) => {
-                if (child instanceof THREE.Mesh) {
-                  child.material = new THREE.MeshPhongMaterial({ color: color, emissive: 0x000000, side: THREE.DoubleSide, flatShading: true });
-                }
-              });
-              obj.scale.set(1000, 1000, 1000)
-              obj.piece = true;
-              this.scene.add(obj);
-            });
-            this.pieceGeometries[side][i][j] = new THREE.Mesh(new THREE.PlaneGeometry(25, 25), new THREE.MeshPhongMaterial({ color: color, emissive: 0x000000, side: THREE.DoubleSide, flatShading: true }));
-            if (side == "posZ") {
-              this.pieceGeometries[side][i][j].position.set(-75 + 50 * j, 75 - 50 * i, 101);
-            } else if (side == "negZ") {
-              this.pieceGeometries[side][i][j].position.set(75 - 50 * j, 75 - 50 * i, -101);
-            } else if (side == "posX") {
-              this.pieceGeometries[side][i][j].position.set(101, 75 - 50 * i, 75 - 50 * j);
-              this.pieceGeometries[side][i][j].rotation.y = Math.PI / 2;
-            } else if (side == "negX") {
-              this.pieceGeometries[side][i][j].position.set(-101, 75 - 50 * i, -75 + 50 * j);
-              this.pieceGeometries[side][i][j].rotation.y = Math.PI / 2;
-            } else if (side == "posY") {
-              this.pieceGeometries[side][i][j].position.set(-75 + 50 * j, 101, -75 + 50 * i);
-              this.pieceGeometries[side][i][j].rotation.x = Math.PI / 2;
-            } else if (side == "negY") {
-              this.pieceGeometries[side][i][j].position.set(-75 + 50 * j, -101, 75 - 50 * i);
-              this.pieceGeometries[side][i][j].rotation.x = Math.PI / 2;
+            if (this.board[side][i][j] instanceof P.Bishop) {
+              this.addPiece("bishop", side, i, j, color);
+            } else if (this.board[side][i][j] instanceof P.Queen) {
+              this.addPiece("queen", side, i, j, color);
+            } else if (this.board[side][i][j] instanceof P.Knight) {
+              this.addPiece("knight", side, i, j, color);
+            } else if (this.board[side][i][j] instanceof P.Rook) {
+              this.addPiece("rook", side, i, j, color);
             }
-            this.pieceGeometries[side][i][j].piece = true;
-            this.scene.add(this.pieceGeometries[side][i][j]);
           }
         }
       }
@@ -146,8 +145,23 @@ export default class App extends React.Component {
       1,
       10000
     );
-    
-    this.createPieces();
+
+    function loadModel(path) {
+      return new Promise(resolve => {
+        new OBJLoader(new THREE.LoadingManager()).load(path, resolve)
+      })
+    }
+
+    let p1 = loadModel("/assets/Bishop.obj").then(result => { this.bishop = result });
+    let p2 = loadModel("/assets/Queen.obj") .then(result => { this.queen  = result });
+    let p3 = loadModel("/assets/Rook.obj")  .then(result => { this.rook   = result });
+    let p4 = loadModel("/assets/Knight.obj").then(result => { this.knight = result });
+    let p5 = loadModel("/assets/King.obj")  .then(result => { this.king   = result });
+    let p6 = loadModel("/assets/Pawn.obj")  .then(result => { this.pawn   = result });
+
+    Promise.all([p1, p2, p3, p4, p5, p6]).then(() => {
+      this.createPieces();
+    });
 
     this.renderer = new THREE.WebGLRenderer({ antialias: true });
     this.renderer.setSize(window.innerWidth, window.innerHeight);
