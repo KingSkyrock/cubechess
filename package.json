@@ -1,5 +1,5 @@
 {
-  "name": "super-chess-battles",
+  "name": "cube-chess",
   "version": "1.0.0",
   "description": "chess game",
   "main": "src/App.js",

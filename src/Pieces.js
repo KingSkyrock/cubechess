@@ -29,6 +29,91 @@ export class Bishop extends Piece {
     x = parseInt(x);
     var movementArr = [];
     var extraMovement = [];
+    
+    function up(x) {
+      var up = connectingSides[side].up
+      var newX = x;
+      if (side == "posY" && (!board[up][0][3 - newX] || board[up][0][3 - newX].color != this.color)) {
+        extraMovement.push({ side: up, x: 3 - newX, y: 0 });
+      } else if (side == "negY" && (!board[up][3][newX] || board[up][3][newX].color != this.color)) {
+        extraMovement.push({ side: up, x: newX, y: 3 });
+      } else if (side == "posZ" && (!board[up][3][newX] || board[up][3][newX].color != this.color)) {
+        extraMovement.push({ side: up, x: newX, y: 3 });
+      } else if (side == "posX" && (!board[up][3 - newX][3] || board[up][3 - newX][3].color != this.color)) {
+        extraMovement.push({ side: up, x: 3, y: 3 - newX });
+      } else if (side == "negZ" && (!board[up][0][3 - newX] || board[up][0][3 - newX].color != this.color)) {
+        extraMovement.push({ side: up, x: 3 - newX, y: 0 });
+      } else if (side == "negX" && (!board[up][newX][0] || board[up][newX][0].color != this.color)) {
+        extraMovement.push({ side: up, x: 0, y: newX });
+      }
+    }
+
+    function left(y) {
+      var left = connectingSides[side].left
+      var newY = y;
+      if (side == "posY" && (!board[left][0][newY] || board[left][0][newY].color != this.color)) {
+        extraMovement.push({ side: left, x: newY, y: 0 });
+      } else if (side == "negY" && (!board[left][3][3 - newY] || board[left][3][3 - newY].color != this.color)) {
+        extraMovement.push({ side: left, x: 3 - newY, y: 3 });
+      } else if (side == "posZ" && (!board[left][newY][3] || board[left][newY][3].color != this.color)) {
+        extraMovement.push({ side: left, x: 3, y: newY });
+      } else if (side == "posX" && (!board[left][newY][3] || board[left][newY][3].color != this.color)) {
+        extraMovement.push({ side: left, x: 3, y: newY });
+      } else if (side == "negZ" && (!board[left][newY][3] || board[left][newY][3].color != this.color)) {
+        extraMovement.push({ side: left, x: 3, y: newY });
+      } else if (side == "negX" && (!board[left][newY][3] || board[left][newY][3].color != this.color)) {
+        extraMovement.push({ side: left, x: 3, y: newY });
+      }
+    }
+
+    function right(y) {
+      var right = connectingSides[side].right
+      var newY = y;
+      if (side == "posY" && (!board[right][0][3 - newY] || board[right][0][3 - newY].color != this.color)) {
+        extraMovement.push({ side: right, x: 3 - newY, y: 0 });
+      } else if (side == "negY" && (!board[right][3][newY] || board[right][3][newY].color != this.color)) {
+        extraMovement.push({ side: right, x: newY, y: 3 });
+      } else if (side == "posZ" && (!board[right][newY][0] || board[right][newY][0].color != this.color)) {
+        extraMovement.push({ side: right, x: 0, y: newY });
+      } else if (side == "posX" && (!board[right][newY][0] || board[right][newY][0].color != this.color)) {
+        extraMovement.push({ side: right, x: 0, y: newY });
+      } else if (side == "negZ" && (!board[right][newY][0] || board[right][newY][0].color != this.color)) {
+        extraMovement.push({ side: right, x: 0, y: newY });
+      } else if (side == "negX" && (!board[right][newY][0] || board[right][newY][0].color != this.color)) {
+        extraMovement.push({ side: right, x: 0, y: newY });
+      }
+    }
+
+    function down(x) {
+      var down = connectingSides[side].down
+      var newX = x;
+      if (side == "posY" && (!board[down][0][newX] || board[down][0][newX].color != this.color)) {
+        extraMovement.push({ side: down, x: newX, y: 0 });
+      } else if (side == "negY" && (!board[down][3][3 - newX] || board[down][3][3 - newX].color != this.color)) {
+        extraMovement.push({ side: down, x: 3 - newX, y: 3 });
+      } else if (side == "posZ" && (!board[down][0][newX] || board[down][0][newX].color != this.color)) {
+        extraMovement.push({ side: down, x: newX, y: 0 });
+      } else if (side == "posX" && (!board[down][newX][3] || board[down][newX][3].color != this.color)) {
+        extraMovement.push({ side: down, x: 3, y: newX });
+      } else if (side == "negZ" && (!board[down][3][3 - newX] || board[down][3][3 - newX].color != this.color)) {
+        extraMovement.push({ side: down, x: 3 - newX, y: 3 });
+      } else if (side == "negX" && (!board[down][3 - newX][0] || board[down][3 - newX][0].color != this.color)) {
+        extraMovement.push({ side: down, x: 0, y: 3 - newX });
+      }
+    }
+
+    if (y == 0) {
+      up(x);
+    }
+    if (x == 0) {
+      left(y);
+    }
+    if (x == 3) {
+      right(y);
+    } 
+    if (y == 3) {
+      down(x);
+    }
 
     if (y != 0 && x != 0 && board[side][y - 1] && (!board[side][y - 1][x - 1] || board[side][y - 1][x - 1].color != this.color)) { //upleft
       var alreadyBeen = false;
@@ -42,38 +127,10 @@ export class Bishop extends Piece {
       } else if (!alreadyBeen) {
         movementArr.push([x - 1, y - 1])
         if (y - 1 == 0) {
-          var up = connectingSides[side].up
-          var newX = x - 1;
-          if (side == "posY" && (!board[up][0][3 - newX] || board[up][0][3 - newX].color != this.color)) {
-            extraMovement.push({ side: up, x: 3 - newX, y: 0 });
-          } else if (side == "negY" && (!board[up][3][newX] || board[up][3][newX].color != this.color)) {
-            extraMovement.push({ side: up, x: newX, y: 3 });
-          } else if (side == "posZ" && (!board[up][3][newX] || board[up][3][newX].color != this.color)) {
-            extraMovement.push({ side: up, x: newX, y: 3 });
-          } else if (side == "posX" && (!board[up][3 - newX][3] || board[up][3 - newX][3].color != this.color)) {
-            extraMovement.push({ side: up, x: 3, y: 3 - newX });
-          } else if (side == "negZ" && (!board[up][0][3 - newX] || board[up][0][3 - newX].color != this.color)) {
-            extraMovement.push({ side: up, x: 3 - newX, y: 0 });
-          } else if (side == "negX" && (!board[up][newX][0] || board[up][newX][0].color != this.color)) {
-            extraMovement.push({ side: up, x: 0, y: newX });
-          }
+          up(x - 1);
         }
         if (x - 1 == 0) {
-          var left = connectingSides[side].left
-          var newY = y - 1;
-          if (side == "posY" && (!board[left][0][newY] || board[left][0][newY].color != this.color)) {
-            extraMovement.push({ side: left, x: newY, y: 0 });
-          } else if (side == "negY" && (!board[left][3][3 - newY] || board[left][3][3 - newY].color != this.color)) {
-            extraMovement.push({ side: left, x: 3 - newY, y: 3 });
-          } else if (side == "posZ" && (!board[left][newY][3] || board[left][newY][3].color != this.color)) {
-            extraMovement.push({ side: left, x: 3, y: newY });
-          } else if (side == "posX" && (!board[left][newY][3] || board[left][newY][3].color != this.color)) {
-            extraMovement.push({ side: left, x: 3, y: newY });
-          } else if (side == "negZ" && (!board[left][newY][3] || board[left][newY][3].color != this.color)) {
-            extraMovement.push({ side: left, x: 3, y: newY });
-          } else if (side == "negX" && (!board[left][newY][3] || board[left][newY][3].color != this.color)) {
-            extraMovement.push({ side: left, x: 3, y: newY });
-          }
+          left(y - 1);
         }
       }
     }
@@ -90,38 +147,10 @@ export class Bishop extends Piece {
       } else if (!alreadyBeen) {
         movementArr.push([x + 1, y - 1])
         if (y - 1 == 0) {
-          var up = connectingSides[side].up
-          var newX = x + 1;
-          if (side == "posY" && (!board[up][0][3 - newX] || board[up][0][3 - newX].color != this.color)) {
-            extraMovement.push({ side: up, x: 3 - newX, y: 0 });
-          } else if (side == "negY" && (!board[up][3][newX] || board[up][3][newX].color != this.color)) {
-            extraMovement.push({ side: up, x: newX, y: 3 });
-          } else if (side == "posZ" && (!board[up][3][newX] || board[up][3][newX].color != this.color)) {
-            extraMovement.push({ side: up, x: newX, y: 3 });
-          } else if (side == "posX" && (!board[up][3 - newX][3] || board[up][3 - newX][3].color != this.color)) {
-            extraMovement.push({ side: up, x: 3, y: 3 - newX });
-          } else if (side == "negZ" && (!board[up][0][3 - newX] || board[up][0][3 - newX].color != this.color)) {
-            extraMovement.push({ side: up, x: 3 - newX, y: 0 });
-          } else if (side == "negX" && (!board[up][newX][0] || board[up][newX][0].color != this.color)) {
-            extraMovement.push({ side: up, x: 0, y: newX });
-          }
+          up(x + 1)
         }
         if (x + 1 == 3) {
-          var right = connectingSides[side].right
-          var newY = y - 1;
-          if (side == "posY" && (!board[right][0][3 - newY] || board[right][0][3 - newY].color != this.color)) {
-            extraMovement.push({ side: right, x: 3 - newY, y: 0 });
-          } else if (side == "negY" && (!board[right][3][newY] || board[right][3][newY].color != this.color)) {
-            extraMovement.push({ side: right, x: newY, y: 3 });
-          } else if (side == "posZ" && (!board[right][newY][0] || board[right][newY][0].color != this.color)) {
-            extraMovement.push({ side: right, x: 0, y: newY });
-          } else if (side == "posX" && (!board[right][newY][0] || board[right][newY][0].color != this.color)) {
-            extraMovement.push({ side: right, x: 0, y: newY });
-          } else if (side == "negZ" && (!board[right][newY][0] || board[right][newY][0].color != this.color)) {
-            extraMovement.push({ side: right, x: 0, y: newY });
-          } else if (side == "negX" && (!board[right][newY][0] || board[right][newY][0].color != this.color)) {
-            extraMovement.push({ side: right, x: 0, y: newY });
-          }
+          right(y - 1);
         }
       }
     }
@@ -137,38 +166,10 @@ export class Bishop extends Piece {
       } else if (!alreadyBeen) {
         movementArr.push([x - 1, y + 1])
         if (y + 1 == 3) {
-          var down = connectingSides[side].down
-          var newX = x - 1;
-          if (side == "posY" && (!board[down][0][newX] || board[down][0][newX].color != this.color)) {
-            extraMovement.push({ side: down, x: newX, y: 0 });
-          } else if (side == "negY" && (!board[down][3][3 - newX] || board[down][3][3 - newX].color != this.color)) {
-            extraMovement.push({ side: down, x: 3 - newX, y: 3 });
-          } else if (side == "posZ" && (!board[down][0][newX] || board[down][0][newX].color != this.color)) {
-            extraMovement.push({ side: down, x: newX, y: 0 });
-          } else if (side == "posX" && (!board[down][newX][3] || board[down][newX][3].color != this.color)) {
-            extraMovement.push({ side: down, x: 3, y: newX });
-          } else if (side == "negZ" && (!board[down][3][3 - newX] || board[down][3][3 - newX].color != this.color)) {
-            extraMovement.push({ side: down, x: 3 - newX, y: 3 });
-          } else if (side == "negX" && (!board[down][3 - newX][0] || board[down][3 - newX][0].color != this.color)) {
-            extraMovement.push({ side: down, x: 0, y: 3 - newX });
-          }
+          down(x - 1)
         }
         if (x - 1 == 0) {
-          var left = connectingSides[side].left
-          var newY = y + 1;
-          if (side == "posY" && (!board[left][0][newY] || board[left][0][newY].color != this.color)) {
-            extraMovement.push({ side: left, x: newY, y: 0 });
-          } else if (side == "negY" && (!board[left][3][3 - newY] || board[left][3][3 - newY].color != this.color)) {
-            extraMovement.push({ side: left, x: 3 - newY, y: 3 });
-          } else if (side == "posZ" && (!board[left][newY][3] || board[left][newY][3].color != this.color)) {
-            extraMovement.push({ side: left, x: 3, y: newY });
-          } else if (side == "posX" && (!board[left][newY][3] || board[left][newY][3].color != this.color)) {
-            extraMovement.push({ side: left, x: 3, y: newY });
-          } else if (side == "negZ" && (!board[left][newY][3] || board[left][newY][3].color != this.color)) {
-            extraMovement.push({ side: left, x: 3, y: newY });
-          } else if (side == "negX" && (!board[left][newY][3] || board[left][newY][3].color != this.color)) {
-            extraMovement.push({ side: left, x: 3, y: newY });
-          }
+          left(y + 1)
         }
       }
     }
@@ -184,38 +185,10 @@ export class Bishop extends Piece {
       } else if (!alreadyBeen) {
         movementArr.push([x + 1, y + 1]);
         if (y + 1 == 3) {
-          var down = connectingSides[side].down
-          var newX = x + 1;
-          if (side == "posY" && (!board[down][0][newX] || board[down][0][newX].color != this.color)) {
-            extraMovement.push({ side: down, x: newX, y: 0 });
-          } else if (side == "negY" && (!board[down][3][3 - newX] || board[down][3][3 - newX].color != this.color)) {
-            extraMovement.push({ side: down, x: 3 - newX, y: 3 });
-          } else if (side == "posZ" && (!board[down][0][newX] || board[down][0][newX].color != this.color)) {
-            extraMovement.push({ side: down, x: newX, y: 0 });
-          } else if (side == "posX" && (!board[down][newX][3] || board[down][newX][3].color != this.color)) {
-            extraMovement.push({ side: down, x: 3, y: newX });
-          } else if (side == "negZ" && (!board[down][3][3 - newX] || board[down][3][3 - newX].color != this.color)) {
-            extraMovement.push({ side: down, x: 3 - newX, y: 3 });
-          } else if (side == "negX" && (!board[down][3 - newX][0] || board[down][3 - newX][0].color != this.color)) {
-            extraMovement.push({ side: down, x: 0, y: 3 - newX });
-          }
+          down(x + 1);
         }
         if (x + 1 == 3) {
-          var right = connectingSides[side].right
-          var newY = y + 1;
-          if (side == "posY" && (!board[right][0][3 - newY] || board[right][0][3 - newY].color != this.color)) {
-            extraMovement.push({ side: right, x: 3 - newY, y: 0 });
-          } else if (side == "negY" && (!board[right][3][newY] || board[right][3][newY].color != this.color)) {
-            extraMovement.push({ side: right, x: newY, y: 3 }); 
-          } else if (side == "posZ" && (!board[right][newY][0] || board[right][newY][0].color != this.color)) {
-            extraMovement.push({ side: right, x: 0, y: newY });
-          } else if (side == "posX" && (!board[right][newY][0] || board[right][newY][0].color != this.color)) {
-            extraMovement.push({ side: right, x: 0, y: newY });
-          } else if (side == "negZ" && (!board[right][newY][0] || board[right][newY][0].color != this.color)) {
-            extraMovement.push({ side: right, x: 0, y: newY });
-          } else if (side == "negX" && (!board[right][newY][0] || board[right][newY][0].color != this.color)) {
-            extraMovement.push({ side: right, x: 0, y: newY });
-          }
+          right(y + 1);
         }
       }
     }
@@ -479,7 +452,6 @@ export class Queen extends Piece {
     for (var [side2, arr] of Object.entries(rookMovement)) {
       moveableCoords[side2] = moveableCoords[side2].concat(arr)
     }
-    console.log(moveableCoords)
     return moveableCoords;
   }
 }
@@ -490,7 +462,7 @@ export class Knight extends Piece {
     this.type = "Knight";
     this.value = 3;
   }
-  movementCalculator(dir, swapX, swapY, x, y, side, board) {
+  movementCalculator(dir, swapX, swapY, x, y, side) {
     y = parseInt(y);
     x = parseInt(x);
     if (dir == "up") {
@@ -545,50 +517,50 @@ export class Knight extends Piece {
       var movement;
       if (side == "posY") {
         if (currentSide == "posY") {
-          movement = this.movementCalculator("right", 3 - currentY, 0, currentX, currentY, currentSide, board);
+          movement = this.movementCalculator("right", 3 - currentY, 0, currentX, currentY, currentSide);
           if (i == 2) {
             info.dir = 0; info.side = currentSide; info.x = currentX; info.y = currentY;
           }
         } else if (currentSide == "posX") {
-          movement = this.movementCalculator("down", currentY, currentX, currentX, currentY, currentSide, board);
+          movement = this.movementCalculator("down", currentY, currentX, currentX, currentY, currentSide);
           if (i == 2) {
             info.dir = 1; info.side = currentSide; info.x = currentX; info.y = currentY;
           }
         } else if (currentSide == "negY") {
-          movement = this.movementCalculator("left", 3 - currentY, 3 - currentX, currentX, currentY, currentSide, board);
+          movement = this.movementCalculator("left", 3 - currentY, 3 - currentX, currentX, currentY, currentSide);
           if (i == 2) {
             info.dir = 0; info.side = currentSide; info.x = currentX; info.y = currentY;
           }
         } else if (currentSide == "negX") {
-          movement = this.movementCalculator("up", currentY, currentX, currentX, currentY, currentSide, board);
+          movement = this.movementCalculator("up", currentY, currentX, currentX, currentY, currentSide);
           if (i == 2) {
             info.dir = 1; info.side = currentSide; info.x = currentX; info.y = currentY;
           }
         }
       } else if (side == "negY") {
         if (currentSide == "negY") {
-          movement = this.movementCalculator("right", currentY, 3, currentX, currentY, currentSide, board);
+          movement = this.movementCalculator("right", currentY, 3, currentX, currentY, currentSide);
           if (i == 2) {
             info.dir = 0; info.side = currentSide; info.x = currentX; info.y = currentY;
           }
         } else if (currentSide == "posX") {
-          movement = this.movementCalculator("up", 3 - currentY, 3 - currentX, currentX, currentY, currentSide, board);
+          movement = this.movementCalculator("up", 3 - currentY, 3 - currentX, currentX, currentY, currentSide);
           if (i == 2) {
             info.dir = 1; info.side = currentSide; info.x = currentX; info.y = currentY;
           }
         } else if (currentSide == "posY") {
-          movement = this.movementCalculator("left", currentY, currentX, currentX, currentY, currentSide, board);
+          movement = this.movementCalculator("left", currentY, currentX, currentX, currentY, currentSide);
           if (i == 2) {
             info.dir = 0; info.side = currentSide; info.x = currentX; info.y = currentY;
           }
         } else if (currentSide == "negX") {
-          movement = this.movementCalculator("down", 3 - currentY, 3 - currentX, currentX, currentY, currentSide, board);
+          movement = this.movementCalculator("down", 3 - currentY, 3 - currentX, currentX, currentY, currentSide);
           if (i == 2) {
             info.dir = 1; info.side = currentSide; info.x = currentX; info.y = currentY;
           }
         }
       } else {
-        movement = this.movementCalculator("right", 0, currentY, currentX, currentY, currentSide, board);
+        movement = this.movementCalculator("right", 0, currentY, currentX, currentY, currentSide);
         if (i == 2) {
           info.dir = 0; info.side = currentSide; info.x = currentX; info.y = currentY;
         }
@@ -596,7 +568,7 @@ export class Knight extends Piece {
       if (movement) { currentX = movement.x; currentY = movement.y; currentSide = movement.side } else break;
     }
 
-    for (var coordinate of this.calcSecondaryMovement(info.dir, info.side, info.x, info.y, board)) {
+    for (var coordinate of this.calcSecondaryMovement(info.dir, info.side, info.x, info.y)) {
       moveableCoords[coordinate.side].push([coordinate.x, coordinate.y])
     }
     info = { dir: null, side: null, x: null, y: null };
@@ -605,57 +577,57 @@ export class Knight extends Piece {
       var movement;
       if (side == "posY") {
         if (currentSide == "posY") {
-          movement = this.movementCalculator("left", currentY, 0, currentX, currentY, currentSide, board);
+          movement = this.movementCalculator("left", currentY, 0, currentX, currentY, currentSide);
           if (i == 2) { 
             info.dir = 0; info.side = currentSide; info.x = currentX; info.y = currentY;
           }
         } else if (currentSide == "negX") {
-          movement = this.movementCalculator("down", 3 - currentY, 3 - currentX, currentX, currentY, currentSide, board);
+          movement = this.movementCalculator("down", 3 - currentY, 3 - currentX, currentX, currentY, currentSide);
           if (i == 2) { 
             info.dir = 1; info.side = currentSide; info.x = currentX; info.y = currentY;
           }
         } else if (currentSide == "negY") {
-          movement = this.movementCalculator("right", currentY, currentX, currentX, currentY, currentSide, board);
+          movement = this.movementCalculator("right", currentY, currentX, currentX, currentY, currentSide);
           if (i == 2) { 
             info.dir = 0; info.side = currentSide; info.x = currentX; info.y = currentY;
           }
         } else if (currentSide == "posX") {
-          movement = this.movementCalculator("up", 3 - currentY, 3 - currentX, currentX, currentY, currentSide, board);
+          movement = this.movementCalculator("up", 3 - currentY, 3 - currentX, currentX, currentY, currentSide);
           if (i == 2) { 
             info.dir = 1; info.side = currentSide; info.x = currentX; info.y = currentY;
           }
         }
       } else if (side == "negY") {
         if (currentSide == "negY") {
-          movement = this.movementCalculator("left", 3 - currentY, 3, currentX, currentY, currentSide, board);
+          movement = this.movementCalculator("left", 3 - currentY, 3, currentX, currentY, currentSide);
           if (i == 2) { 
             info.dir = 0; info.side = currentSide; info.x = currentX; info.y = currentY;
           }
         } else if (currentSide == "negX") {
-          movement = this.movementCalculator("up", currentY, currentX, currentX, currentY, currentSide, board);
+          movement = this.movementCalculator("up", currentY, currentX, currentX, currentY, currentSide);
           if (i == 2) { 
             info.dir = 1; info.side = currentSide; info.x = currentX; info.y = currentY;
           }
         } else if (currentSide == "posY") {
-          movement = this.movementCalculator("right", 3 - currentY, 3 - currentX, currentX, currentY, currentSide, board);
+          movement = this.movementCalculator("right", 3 - currentY, 3 - currentX, currentX, currentY, currentSide);
           if (i == 2) { 
             info.dir = 0; info.side = currentSide; info.x = currentX; info.y = currentY;
           }
         } else if (currentSide == "posX") {
-          movement = this.movementCalculator("down", currentY, currentX, currentX, currentY, currentSide, board);
+          movement = this.movementCalculator("down", currentY, currentX, currentX, currentY, currentSide);
           if (i == 2) { 
             info.dir = 1; info.side = currentSide; info.x = currentX; info.y = currentY;
           }
         }
       } else {
-        movement = this.movementCalculator("left", 3, currentY, currentX, currentY, currentSide, board);
+        movement = this.movementCalculator("left", 3, currentY, currentX, currentY, currentSide);
         if (i == 2) { 
           info.dir = 0; info.side = currentSide; info.x = currentX; info.y = currentY;
         }
       }
       if (movement) { currentX = movement.x; currentY = movement.y; currentSide = movement.side } else break;
     }
-    for (var coordinate of this.calcSecondaryMovement(info.dir, info.side, info.x, info.y, board)) {
+    for (var coordinate of this.calcSecondaryMovement(info.dir, info.side, info.x, info.y)) {
       moveableCoords[coordinate.side].push([coordinate.x, coordinate.y])
     }
     info = { dir: null, side: null, x: null, y: null };
@@ -664,78 +636,78 @@ export class Knight extends Piece {
       var movement;
       if (side == "posZ" || side == "posY" || side == "negY") {
         if (currentSide == "negZ") {
-          movement = this.movementCalculator("down", 3 - currentX, 3, currentX, currentY, currentSide, board);
+          movement = this.movementCalculator("down", 3 - currentX, 3, currentX, currentY, currentSide);
           if (i == 2) {
             info.dir = 1; info.side = currentSide; info.x = currentX; info.y = currentY;
           }
         } else if (currentSide == "posY") {
-          movement = this.movementCalculator("up", 3 - currentX, 0, currentX, currentY, currentSide, board);
+          movement = this.movementCalculator("up", 3 - currentX, 0, currentX, currentY, currentSide);
           if (i == 2) {
             info.dir = 1; info.side = currentSide; info.x = currentX; info.y = currentY;
           }
         } else {
-          movement = this.movementCalculator("up", currentX, 3, currentX, currentY, currentSide, board);
+          movement = this.movementCalculator("up", currentX, 3, currentX, currentY, currentSide);
           if (i == 2) {
             info.dir = 1; info.side = currentSide; info.x = currentX; info.y = currentY;
           }
         }
       } else if (side == "posX") {
         if (currentSide == "posX") {
-          movement = this.movementCalculator("up", 3, 3 - currentX, currentX, currentY, currentSide, board);
+          movement = this.movementCalculator("up", 3, 3 - currentX, currentX, currentY, currentSide);
           if (i == 2) {
             info.dir = 1; info.side = currentSide; info.x = currentX; info.y = currentY;
           }
         } else if (currentSide == "posY") {
-          movement = this.movementCalculator("left", currentY, currentX, currentX, currentY, currentSide, board);
+          movement = this.movementCalculator("left", currentY, currentX, currentX, currentY, currentSide);
           if (i == 2) {
             info.dir = 0; info.side = currentSide; info.x = currentX; info.y = currentY;
           }
         } else if (currentSide == "negX") {
-          movement = this.movementCalculator("down", 0, 3 - currentX, currentX, currentY, currentSide, board);
+          movement = this.movementCalculator("down", 0, 3 - currentX, currentX, currentY, currentSide);
           if (i == 2) {
             info.dir = 1; info.side = currentSide; info.x = currentX; info.y = currentY;
           }
         } else if (currentSide == "negY") {
-          movement = this.movementCalculator("right", currentY, currentX, currentX, currentY, currentSide, board);
+          movement = this.movementCalculator("right", currentY, currentX, currentX, currentY, currentSide);
           if (i == 2) {
             info.dir = 0; info.side = currentSide; info.x = currentX; info.y = currentY;
           }
         }
       } else if (side == "negX") {
         if (currentSide == "negX") {
-          movement = this.movementCalculator("up", currentY, currentX, currentX, currentY, currentSide, board);
+          movement = this.movementCalculator("up", currentY, currentX, currentX, currentY, currentSide);
           if (i == 2) {
             info.dir = 1; info.side = currentSide; info.x = currentX; info.y = currentY;
           }
         } else if (currentSide == "posY") {
-          movement = this.movementCalculator("right", 3 - currentY, 0, currentX, currentY, currentSide, board);
+          movement = this.movementCalculator("right", 3 - currentY, 0, currentX, currentY, currentSide);
           if (i == 2) {
             info.dir = 0; info.side = currentSide; info.x = currentX; info.y = currentY;
           }
         } else if (currentSide == "posX") {
-          movement = this.movementCalculator("down", 3, currentX, currentX, currentY, currentSide, board);
+          movement = this.movementCalculator("down", 3, currentX, currentX, currentY, currentSide);
           if (i == 2) {
             info.dir = 1; info.side = currentSide; info.x = currentX; info.y = currentY;
           }
         } else if (currentSide == "negY") {
-          movement = this.movementCalculator("left", 3 - currentY, 3, currentX, currentY, currentSide, board);
+          movement = this.movementCalculator("left", 3 - currentY, 3, currentX, currentY, currentSide);
           if (i == 2) {
             info.dir = 0; info.side = currentSide; info.x = currentX; info.y = currentY;
           }
         }
       } else if (side == "negZ") {
         if (currentSide == "negZ") {
-          movement = this.movementCalculator("up", 3 - currentX, 0, currentX, currentY, currentSide, board);
+          movement = this.movementCalculator("up", 3 - currentX, 0, currentX, currentY, currentSide);
           if (i == 2) {
             info.dir = 1; info.side = currentSide; info.x = currentX; info.y = currentY;
           }
         } else if (currentSide == "negY") {
-          movement = this.movementCalculator("down", 3 - currentX, 3, currentX, currentY, currentSide, board);
+          movement = this.movementCalculator("down", 3 - currentX, 3, currentX, currentY, currentSide);
           if (i == 2) {
             info.dir = 1; info.side = currentSide; info.x = currentX; info.y = currentY;
           }
         } else {
-          movement = this.movementCalculator("down", currentX, 0, currentX, currentY, currentSide, board);
+          movement = this.movementCalculator("down", currentX, 0, currentX, currentY, currentSide);
           if (i == 2) {
             info.dir = 1; info.side = currentSide; info.x = currentX; info.y = currentY;
           }
@@ -743,7 +715,7 @@ export class Knight extends Piece {
       }
       if (movement) { currentX = movement.x; currentY = movement.y; currentSide = movement.side } else break;
     }
-    for (var coordinate of this.calcSecondaryMovement(info.dir, info.side, info.x, info.y, board)) {
+    for (var coordinate of this.calcSecondaryMovement(info.dir, info.side, info.x, info.y)) {
       moveableCoords[coordinate.side].push([coordinate.x, coordinate.y])
     }
     info = { dir: null, side: null, x: null, y: null };
@@ -752,78 +724,78 @@ export class Knight extends Piece {
       var movement;
       if (side == "posZ" || side == "posY" || side == "negY") {
         if (currentSide == "negZ") {
-          movement = this.movementCalculator("up", 3 - currentX, 0, currentX, currentY, currentSide, board);
+          movement = this.movementCalculator("up", 3 - currentX, 0, currentX, currentY, currentSide);
           if (i == 2) {
             info.dir = 1; info.side = currentSide; info.x = currentX; info.y = currentY;
           }
         } else if (currentSide == "negY") {
-          movement = this.movementCalculator("down", 3 - currentX, 3, currentX, currentY, currentSide, board);
+          movement = this.movementCalculator("down", 3 - currentX, 3, currentX, currentY, currentSide);
           if (i == 2) {
             info.dir = 1; info.side = currentSide; info.x = currentX; info.y = currentY;
           }
         } else {
-          movement = this.movementCalculator("down", currentX, 0, currentX, currentY, currentSide, board);
+          movement = this.movementCalculator("down", currentX, 0, currentX, currentY, currentSide);
           if (i == 2) {
             info.dir = 1; info.side = currentSide; info.x = currentX; info.y = currentY;
           }
         }
       } else if (side == "posX") {
         if (currentSide == "posX") {
-          movement = this.movementCalculator("down", 3, currentX, currentX, currentY, currentSide, board);
+          movement = this.movementCalculator("down", 3, currentX, currentX, currentY, currentSide);
           if (i == 2) {
             info.dir = 1; info.side = currentSide; info.x = currentX; info.y = currentY;
           }
         } else if (currentSide == "negY") {
-          movement = this.movementCalculator("left", 3 - currentY, 3, currentX, currentY, currentSide, board);
+          movement = this.movementCalculator("left", 3 - currentY, 3, currentX, currentY, currentSide);
           if (i == 2) {
             info.dir = 0; info.side = currentSide; info.x = currentX; info.y = currentY;
           }
         } else if (currentSide == "negX") {
-          movement = this.movementCalculator("up", 0, currentX, currentX, currentY, currentSide, board);
+          movement = this.movementCalculator("up", 0, currentX, currentX, currentY, currentSide);
           if (i == 2) {
             info.dir = 1; info.side = currentSide; info.x = currentX; info.y = currentY;
           }
         } else if (currentSide == "posY") {
-          movement = this.movementCalculator("right", 3 - currentY, 0, currentX, currentY, currentSide, board);
+          movement = this.movementCalculator("right", 3 - currentY, 0, currentX, currentY, currentSide);
           if (i == 2) {
             info.dir = 0; info.side = currentSide; info.x = currentX; info.y = currentY;
           }
         }
       } else if (side == "negX") {
         if (currentSide == "negX") {
-          movement = this.movementCalculator("down", 0, 3 - currentX, currentX, currentY, currentSide, board);
+          movement = this.movementCalculator("down", 0, 3 - currentX, currentX, currentY, currentSide);
           if (i == 2) {
             info.dir = 1; info.side = currentSide; info.x = currentX; info.y = currentY;
           }
         } else if (currentSide == "negY") {
-          movement = this.movementCalculator("right", currentY, 3, currentX, currentY, currentSide, board);
+          movement = this.movementCalculator("right", currentY, 3, currentX, currentY, currentSide);
           if (i == 2) {
             info.dir = 0; info.side = currentSide; info.x = currentX; info.y = currentY;
           }
         } else if (currentSide == "posX") {
-          movement = this.movementCalculator("up", 3, 3 - currentX, currentX, currentY, currentSide, board);
+          movement = this.movementCalculator("up", 3, 3 - currentX, currentX, currentY, currentSide);
           if (i == 2) {
             info.dir = 1; info.side = currentSide; info.x = currentX; info.y = currentY;
           }
         } else if (currentSide == "posY") {
-          movement = this.movementCalculator("left", currentY, 0, currentX, currentY, currentSide, board);
+          movement = this.movementCalculator("left", currentY, 0, currentX, currentY, currentSide);
           if (i == 2) {
             info.dir = 0; info.side = currentSide; info.x = currentX; info.y = currentY;
           }
         }
       } else if (side == "negZ") {
         if (currentSide == "negZ") {
-          movement = this.movementCalculator("down", 3 - currentX, 3, currentX, currentY, currentSide, board);
+          movement = this.movementCalculator("down", 3 - currentX, 3, currentX, currentY, currentSide);
           if (i == 2) {
             info.dir = 1; info.side = currentSide; info.x = currentX; info.y = currentY;
           }
         } else if (currentSide == "posY") {
-          movement = this.movementCalculator("up", 3 - currentX, 0, currentX, currentY, currentSide, board);
+          movement = this.movementCalculator("up", 3 - currentX, 0, currentX, currentY, currentSide);
           if (i == 2) {
             info.dir = 1; info.side = currentSide; info.x = currentX; info.y = currentY;
           }
         } else {
-          movement = this.movementCalculator("up", currentX, 3, currentX, currentY, currentSide, board);
+          movement = this.movementCalculator("up", currentX, 3, currentX, currentY, currentSide);
           if (i == 2) {
             info.dir = 1; info.side = currentSide; info.x = currentX; info.y = currentY;
           }
@@ -847,26 +819,26 @@ export class Knight extends Piece {
       var movement;
       if (side == "posY") {
         if (currentSide == "posY") {
-          movement = this.movementCalculator("right", 3 - currentY, 0, currentX, currentY, currentSide, board);
+          movement = this.movementCalculator("right", 3 - currentY, 0, currentX, currentY, currentSide);
         } else if (currentSide == "posX") {
-          movement = this.movementCalculator("down", currentY, currentX, currentX, currentY, currentSide, board);
+          movement = this.movementCalculator("down", currentY, currentX, currentX, currentY, currentSide);
         } else if (currentSide == "negY") {
-          movement = this.movementCalculator("left", 3 - currentY, 3 - currentX, currentX, currentY, currentSide, board);
+          movement = this.movementCalculator("left", 3 - currentY, 3 - currentX, currentX, currentY, currentSide);
         } else if (currentSide == "negX") {
-          movement = this.movementCalculator("up", currentY, currentX, currentX, currentY, currentSide, board);
+          movement = this.movementCalculator("up", currentY, currentX, currentX, currentY, currentSide);
         }
       } else if (side == "negY") {
         if (currentSide == "negY") {
-          movement = this.movementCalculator("right", currentY, 3, currentX, currentY, currentSide, board);
+          movement = this.movementCalculator("right", currentY, 3, currentX, currentY, currentSide);
         } else if (currentSide == "posX") {
-          movement = this.movementCalculator("up", 3 - currentY, 3 - currentX, currentX, currentY, currentSide, board);
+          movement = this.movementCalculator("up", 3 - currentY, 3 - currentX, currentX, currentY, currentSide);
         } else if (currentSide == "posY") {
-          movement = this.movementCalculator("left", currentY, currentX, currentX, currentY, currentSide, board);
+          movement = this.movementCalculator("left", currentY, currentX, currentX, currentY, currentSide);
         } else if (currentSide == "negX") {
-          movement = this.movementCalculator("down", 3 - currentY, 3 - currentX, currentX, currentY, currentSide, board);
+          movement = this.movementCalculator("down", 3 - currentY, 3 - currentX, currentX, currentY, currentSide);
         }
       } else {
-        movement = this.movementCalculator("right", 0, currentY, currentX, currentY, currentSide, board);
+        movement = this.movementCalculator("right", 0, currentY, currentX, currentY, currentSide);
       }
       if (movement) { currentX = movement.x; currentY = movement.y; currentSide = movement.side } 
       moveableCoordsArr.push({ side: currentSide, x: currentX, y: currentY})
@@ -875,26 +847,26 @@ export class Knight extends Piece {
       currentSide = side, currentX = x, currentY = y, movement = null;
       if (side == "posY") {
         if (currentSide == "posY") {
-          movement = this.movementCalculator("left", currentY, 0, currentX, currentY, currentSide, board);
+          movement = this.movementCalculator("left", currentY, 0, currentX, currentY, currentSide);
         } else if (currentSide == "negX") {
-          movement = this.movementCalculator("down", 3 - currentY, 3 - currentX, currentX, currentY, currentSide, board);
+          movement = this.movementCalculator("down", 3 - currentY, 3 - currentX, currentX, currentY, currentSide);
         } else if (currentSide == "negY") {
-          movement = this.movementCalculator("right", currentY, currentX, currentX, currentY, currentSide, board);
+          movement = this.movementCalculator("right", currentY, currentX, currentX, currentY, currentSide);
         } else if (currentSide == "posX") {
-          movement = this.movementCalculator("up", 3 - currentY, 3 - currentX, currentX, currentY, currentSide, board);
+          movement = this.movementCalculator("up", 3 - currentY, 3 - currentX, currentX, currentY, currentSide);
         }
       } else if (side == "negY") {
         if (currentSide == "negY") {
-          movement = this.movementCalculator("left", 3 - currentY, 3, currentX, currentY, currentSide, board);
+          movement = this.movementCalculator("left", 3 - currentY, 3, currentX, currentY, currentSide);
         } else if (currentSide == "negX") {
-          movement = this.movementCalculator("up", currentY, currentX, currentX, currentY, currentSide, board);
+          movement = this.movementCalculator("up", currentY, currentX, currentX, currentY, currentSide);
         } else if (currentSide == "posY") {
-          movement = this.movementCalculator("right", 3 - currentY, 3 - currentX, currentX, currentY, currentSide, board);
+          movement = this.movementCalculator("right", 3 - currentY, 3 - currentX, currentX, currentY, currentSide);
         } else if (currentSide == "posX") {
-          movement = this.movementCalculator("down", currentY, currentX, currentX, currentY, currentSide, board);
+          movement = this.movementCalculator("down", currentY, currentX, currentX, currentY, currentSide);
         }
       } else {
-        movement = this.movementCalculator("left", 3, currentY, currentX, currentY, currentSide, board);
+        movement = this.movementCalculator("left", 3, currentY, currentX, currentY, currentSide);
       }
       if (movement) { currentX = movement.x; currentY = movement.y; currentSide = movement.side }
       moveableCoordsArr.push({ side: currentSide, x: currentX, y: currentY })
@@ -903,39 +875,39 @@ export class Knight extends Piece {
       var movement;
       if (side == "posZ" || side == "posY" || side == "negY") {
         if (currentSide == "negZ") {
-          movement = this.movementCalculator("down", 3 - currentX, 3, currentX, currentY, currentSide, board);
+          movement = this.movementCalculator("down", 3 - currentX, 3, currentX, currentY, currentSide);
         } else if (currentSide == "posY") {
-          movement = this.movementCalculator("up", 3 - currentX, 0, currentX, currentY, currentSide, board);
+          movement = this.movementCalculator("up", 3 - currentX, 0, currentX, currentY, currentSide);
         } else {
-          movement = this.movementCalculator("up", currentX, 3, currentX, currentY, currentSide, board);
+          movement = this.movementCalculator("up", currentX, 3, currentX, currentY, currentSide);
         }
       } else if (side == "posX") {
         if (currentSide == "posX") {
-          movement = this.movementCalculator("up", 3, 3 - currentX, currentX, currentY, currentSide, board);
+          movement = this.movementCalculator("up", 3, 3 - currentX, currentX, currentY, currentSide);
         } else if (currentSide == "posY") {
-          movement = this.movementCalculator("left", currentY, currentX, currentX, currentY, currentSide, board);
+          movement = this.movementCalculator("left", currentY, currentX, currentX, currentY, currentSide);
         } else if (currentSide == "negX") {
-          movement = this.movementCalculator("down", 0, 3 - currentX, currentX, currentY, currentSide, board);
+          movement = this.movementCalculator("down", 0, 3 - currentX, currentX, currentY, currentSide);
         } else if (currentSide == "negY") {
-          movement = this.movementCalculator("right", currentY, currentX, currentX, currentY, currentSide, board);
+          movement = this.movementCalculator("right", currentY, currentX, currentX, currentY, currentSide);
         }
       } else if (side == "negX") {
         if (currentSide == "negX") {
-          movement = this.movementCalculator("up", currentY, currentX, currentX, currentY, currentSide, board);
+          movement = this.movementCalculator("up", currentY, currentX, currentX, currentY, currentSide);
         } else if (currentSide == "posY") {
-          movement = this.movementCalculator("right", 3 - currentY, 0, currentX, currentY, currentSide, board);
+          movement = this.movementCalculator("right", 3 - currentY, 0, currentX, currentY, currentSide);
         } else if (currentSide == "posX") {
-          movement = this.movementCalculator("down", 3, currentX, currentX, currentY, currentSide, board);
+          movement = this.movementCalculator("down", 3, currentX, currentX, currentY, currentSide);
         } else if (currentSide == "negY") {
-          movement = this.movementCalculator("left", 3 - currentY, 3, currentX, currentY, currentSide, board);
+          movement = this.movementCalculator("left", 3 - currentY, 3, currentX, currentY, currentSide);
         }
       } else if (side == "negZ") {
         if (currentSide == "negZ") {
-          movement = this.movementCalculator("up", 3 - currentX, 0, currentX, currentY, currentSide, board);
+          movement = this.movementCalculator("up", 3 - currentX, 0, currentX, currentY, currentSide);
         } else if (currentSide == "negY") {
-          movement = this.movementCalculator("down", 3 - currentX, 3, currentX, currentY, currentSide, board);
+          movement = this.movementCalculator("down", 3 - currentX, 3, currentX, currentY, currentSide);
         } else {
-          movement = this.movementCalculator("down", currentX, 0, currentX, currentY, currentSide, board);
+          movement = this.movementCalculator("down", currentX, 0, currentX, currentY, currentSide);
         }
       }
       if (movement) { currentX = movement.x; currentY = movement.y; currentSide = movement.side }
@@ -945,39 +917,39 @@ export class Knight extends Piece {
       currentSide = side, currentX = x, currentY = y, movement = null;
       if (side == "posZ" || side == "posY" || side == "negY") {
         if (currentSide == "negZ") {
-          movement = this.movementCalculator("up", 3 - currentX, 0, currentX, currentY, currentSide, board);
+          movement = this.movementCalculator("up", 3 - currentX, 0, currentX, currentY, currentSide);
         } else if (currentSide == "negY") {
-          movement = this.movementCalculator("down", 3 - currentX, 3, currentX, currentY, currentSide, board);
+          movement = this.movementCalculator("down", 3 - currentX, 3, currentX, currentY, currentSide);
         } else {
-          movement = this.movementCalculator("down", currentX, 0, currentX, currentY, currentSide, board);
+          movement = this.movementCalculator("down", currentX, 0, currentX, currentY, currentSide);
         }
       } else if (side == "posX") {
         if (currentSide == "posX") {
-          movement = this.movementCalculator("down", 3, currentX, currentX, currentY, currentSide, board);
+          movement = this.movementCalculator("down", 3, currentX, currentX, currentY, currentSide);
         } else if (currentSide == "negY") {
-          movement = this.movementCalculator("left", 3 - currentY, 3, currentX, currentY, currentSide, board);
+          movement = this.movementCalculator("left", 3 - currentY, 3, currentX, currentY, currentSide);
         } else if (currentSide == "negX") {
-          movement = this.movementCalculator("up", 0, currentX, currentX, currentY, currentSide, board);
+          movement = this.movementCalculator("up", 0, currentX, currentX, currentY, currentSide);
         } else if (currentSide == "posY") {
-          movement = this.movementCalculator("right", 3 - currentY, 0, currentX, currentY, currentSide, board);
+          movement = this.movementCalculator("right", 3 - currentY, 0, currentX, currentY, currentSide);
         }
       } else if (side == "negX") {
         if (currentSide == "negX") {
-          movement = this.movementCalculator("down", 0, 3 - currentX, currentX, currentY, currentSide, board);
+          movement = this.movementCalculator("down", 0, 3 - currentX, currentX, currentY, currentSide);
         } else if (currentSide == "negY") {
-          movement = this.movementCalculator("right", currentY, 3, currentX, currentY, currentSide, board);
+          movement = this.movementCalculator("right", currentY, 3, currentX, currentY, currentSide);
         } else if (currentSide == "posX") {
-          movement = this.movementCalculator("up", 3, 3 - currentX, currentX, currentY, currentSide, board);
+          movement = this.movementCalculator("up", 3, 3 - currentX, currentX, currentY, currentSide);
         } else if (currentSide == "posY") {
-          movement = this.movementCalculator("left", currentY, 0, currentX, currentY, currentSide, board);
+          movement = this.movementCalculator("left", currentY, 0, currentX, currentY, currentSide);
         }
       } else if (side == "negZ") {
         if (currentSide == "negZ") {
-          movement = this.movementCalculator("down", 3 - currentX, 3, currentX, currentY, currentSide, board);
+          movement = this.movementCalculator("down", 3 - currentX, 3, currentX, currentY, currentSide);
         } else if (currentSide == "posY") {
-          movement = this.movementCalculator("up", 3 - currentX, 0, currentX, currentY, currentSide, board);
+          movement = this.movementCalculator("up", 3 - currentX, 0, currentX, currentY, currentSide);
         } else {
-          movement = this.movementCalculator("up", currentX, 3, currentX, currentY, currentSide, board);
+          movement = this.movementCalculator("up", currentX, 3, currentX, currentY, currentSide);
         }
       }
       if (movement) { currentX = movement.x; currentY = movement.y; currentSide = movement.side }
