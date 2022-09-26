@@ -103,16 +103,16 @@ export class Bishop extends Piece {
     }
 
     if (y == 0) {
-      up(x);
+      () => up(x);
     }
     if (x == 0) {
-      left(y);
+      () => left(y);
     }
     if (x == 3) {
-      right(y);
+      () => right(y);
     } 
     if (y == 3) {
-      down(x);
+      () => down(x);
     }
 
     if (y != 0 && x != 0 && board[side][y - 1] && (!board[side][y - 1][x - 1] || board[side][y - 1][x - 1].color != this.color)) { //upleft
@@ -127,10 +127,10 @@ export class Bishop extends Piece {
       } else if (!alreadyBeen) {
         movementArr.push([x - 1, y - 1])
         if (y - 1 == 0) {
-          up(x - 1);
+          () => up(x - 1);
         }
         if (x - 1 == 0) {
-          left(y - 1);
+          () => left(y - 1);
         }
       }
     }
@@ -147,10 +147,10 @@ export class Bishop extends Piece {
       } else if (!alreadyBeen) {
         movementArr.push([x + 1, y - 1])
         if (y - 1 == 0) {
-          up(x + 1)
+          () => up(x + 1);
         }
         if (x + 1 == 3) {
-          right(y - 1);
+          () => right(y - 1);
         }
       }
     }
@@ -166,10 +166,10 @@ export class Bishop extends Piece {
       } else if (!alreadyBeen) {
         movementArr.push([x - 1, y + 1])
         if (y + 1 == 3) {
-          down(x - 1)
+          () => down(x - 1);
         }
         if (x - 1 == 0) {
-          left(y + 1)
+          () => left(y + 1);
         }
       }
     }
@@ -185,10 +185,10 @@ export class Bishop extends Piece {
       } else if (!alreadyBeen) {
         movementArr.push([x + 1, y + 1]);
         if (y + 1 == 3) {
-          down(x + 1);
+          () => down(x + 1);
         }
         if (x + 1 == 3) {
-          right(y + 1);
+          () => right(y + 1);
         }
       }
     }
