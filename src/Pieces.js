@@ -456,6 +456,517 @@ export class Queen extends Piece {
   }
 }
 
+export class King extends Piece {
+  constructor(color) {
+    super(color)
+    this.type = "King";
+    this.value = -1;
+  }
+
+  //movement is just a modified knight, could be made a lot shorter
+
+  movementCalculator(dir, swapX, swapY, x, y, side) {
+    y = parseInt(y);
+    x = parseInt(x);
+    if (dir == "up") {
+      if (y != 0) {
+        y--;
+      } else if (y == 0) {
+        side = connectingSides[side].up;
+        y = swapY;
+        x = swapX;
+      } else {
+        return false;
+      }
+    } else if (dir == "down") {
+      if (y != 3) {
+        y++;
+      } else if (y == 3) {
+        side = connectingSides[side].down;
+        y = swapY;
+        x = swapX;
+      } else {
+        return false;
+      }
+    } else if (dir == "left") {
+      if (x != 0) {
+        x--;
+      } else if (x == 0) {
+        side = connectingSides[side].left;
+        y = swapY;
+        x = swapX;
+      } else {
+        return false;
+      }
+    } else if (dir == "right") {
+      if (x != 3) {
+        x++;
+      } else if (x == 3) {
+        side = connectingSides[side].right;
+        y = swapY;
+        x = swapX;
+      } else {
+        return false;
+      }
+    }
+    return { side: side, x: x, y: y }
+  }
+
+  getMovement(side, x, y, board) {
+    var moveableCoords = { posY: [], negY: [], posX: [], negX: [], posZ: [], negZ: [], };
+    var currentSide = side, currentX = x, currentY = y;
+    var info = { dir: null, side: null, x: null, y: null }; //dir 0 is verical, dir 1 is horizontal
+    for (var i = 0; i < 2; i++) { //right
+      var movement;
+      if (side == "posY") {
+        if (currentSide == "posY") {
+          movement = this.movementCalculator("right", 3 - currentY, 0, currentX, currentY, currentSide);
+          if (i == 1) {
+            info.dir = 0; info.side = currentSide; info.x = currentX; info.y = currentY;
+          }
+        } else if (currentSide == "posX") {
+          movement = this.movementCalculator("down", currentY, currentX, currentX, currentY, currentSide);
+          if (i == 1) {
+            info.dir = 1; info.side = currentSide; info.x = currentX; info.y = currentY;
+          }
+        } else if (currentSide == "negY") {
+          movement = this.movementCalculator("left", 3 - currentY, 3 - currentX, currentX, currentY, currentSide);
+          if (i == 1) {
+            info.dir = 0; info.side = currentSide; info.x = currentX; info.y = currentY;
+          }
+        } else if (currentSide == "negX") {
+          movement = this.movementCalculator("up", currentY, currentX, currentX, currentY, currentSide);
+          if (i == 1) {
+            info.dir = 1; info.side = currentSide; info.x = currentX; info.y = currentY;
+          }
+        }
+      } else if (side == "negY") {
+        if (currentSide == "negY") {
+          movement = this.movementCalculator("right", currentY, 3, currentX, currentY, currentSide);
+          if (i == 1) {
+            info.dir = 0; info.side = currentSide; info.x = currentX; info.y = currentY;
+          }
+        } else if (currentSide == "posX") {
+          movement = this.movementCalculator("up", 3 - currentY, 3 - currentX, currentX, currentY, currentSide);
+          if (i == 1) {
+            info.dir = 1; info.side = currentSide; info.x = currentX; info.y = currentY;
+          }
+        } else if (currentSide == "posY") {
+          movement = this.movementCalculator("left", currentY, currentX, currentX, currentY, currentSide);
+          if (i == 1) {
+            info.dir = 0; info.side = currentSide; info.x = currentX; info.y = currentY;
+          }
+        } else if (currentSide == "negX") {
+          movement = this.movementCalculator("down", 3 - currentY, 3 - currentX, currentX, currentY, currentSide);
+          if (i == 1) {
+            info.dir = 1; info.side = currentSide; info.x = currentX; info.y = currentY;
+          }
+        }
+      } else {
+        movement = this.movementCalculator("right", 0, currentY, currentX, currentY, currentSide);
+        if (i == 1) {
+          info.dir = 0; info.side = currentSide; info.x = currentX; info.y = currentY;
+        }
+      }
+      if (movement) { currentX = movement.x; currentY = movement.y; currentSide = movement.side } else break;
+    }
+    moveableCoords[info.side].push([info.x, info.y])
+    for (var coordinate of this.calcSecondaryMovement(info.dir, info.side, info.x, info.y)) {
+      moveableCoords[coordinate.side].push([coordinate.x, coordinate.y])
+    }
+    info = { dir: null, side: null, x: null, y: null };
+    currentSide = side, currentX = x, currentY = y;
+    for (var i = 0; i < 2; i++) { //left
+      var movement;
+      if (side == "posY") {
+        if (currentSide == "posY") {
+          movement = this.movementCalculator("left", currentY, 0, currentX, currentY, currentSide);
+          if (i == 1) {
+            info.dir = 0; info.side = currentSide; info.x = currentX; info.y = currentY;
+          }
+        } else if (currentSide == "negX") {
+          movement = this.movementCalculator("down", 3 - currentY, 3 - currentX, currentX, currentY, currentSide);
+          if (i == 1) {
+            info.dir = 1; info.side = currentSide; info.x = currentX; info.y = currentY;
+          }
+        } else if (currentSide == "negY") {
+          movement = this.movementCalculator("right", currentY, currentX, currentX, currentY, currentSide);
+          if (i == 1) {
+            info.dir = 0; info.side = currentSide; info.x = currentX; info.y = currentY;
+          }
+        } else if (currentSide == "posX") {
+          movement = this.movementCalculator("up", 3 - currentY, 3 - currentX, currentX, currentY, currentSide);
+          if (i == 1) {
+            info.dir = 1; info.side = currentSide; info.x = currentX; info.y = currentY;
+          }
+        }
+      } else if (side == "negY") {
+        if (currentSide == "negY") {
+          movement = this.movementCalculator("left", 3 - currentY, 3, currentX, currentY, currentSide);
+          if (i == 1) {
+            info.dir = 0; info.side = currentSide; info.x = currentX; info.y = currentY;
+          }
+        } else if (currentSide == "negX") {
+          movement = this.movementCalculator("up", currentY, currentX, currentX, currentY, currentSide);
+          if (i == 1) {
+            info.dir = 1; info.side = currentSide; info.x = currentX; info.y = currentY;
+          }
+        } else if (currentSide == "posY") {
+          movement = this.movementCalculator("right", 3 - currentY, 3 - currentX, currentX, currentY, currentSide);
+          if (i == 1) {
+            info.dir = 0; info.side = currentSide; info.x = currentX; info.y = currentY;
+          }
+        } else if (currentSide == "posX") {
+          movement = this.movementCalculator("down", currentY, currentX, currentX, currentY, currentSide);
+          if (i == 1) {
+            info.dir = 1; info.side = currentSide; info.x = currentX; info.y = currentY;
+          }
+        }
+      } else {
+        movement = this.movementCalculator("left", 3, currentY, currentX, currentY, currentSide);
+        if (i == 1) {
+          info.dir = 0; info.side = currentSide; info.x = currentX; info.y = currentY;
+        }
+      }
+      if (movement) { currentX = movement.x; currentY = movement.y; currentSide = movement.side } else break;
+    }
+    moveableCoords[info.side].push([info.x, info.y])
+    for (var coordinate of this.calcSecondaryMovement(info.dir, info.side, info.x, info.y)) {
+      moveableCoords[coordinate.side].push([coordinate.x, coordinate.y])
+    }
+    info = { dir: null, side: null, x: null, y: null };
+    currentSide = side, currentX = x, currentY = y;
+    for (var i = 0; i < 2; i++) { //up
+      var movement;
+      if (side == "posZ" || side == "posY" || side == "negY") {
+        if (currentSide == "negZ") {
+          movement = this.movementCalculator("down", 3 - currentX, 3, currentX, currentY, currentSide);
+          if (i == 1) {
+            info.dir = 1; info.side = currentSide; info.x = currentX; info.y = currentY;
+          }
+        } else if (currentSide == "posY") {
+          movement = this.movementCalculator("up", 3 - currentX, 0, currentX, currentY, currentSide);
+          if (i == 1) {
+            info.dir = 1; info.side = currentSide; info.x = currentX; info.y = currentY;
+          }
+        } else {
+          movement = this.movementCalculator("up", currentX, 3, currentX, currentY, currentSide);
+          if (i == 1) {
+            info.dir = 1; info.side = currentSide; info.x = currentX; info.y = currentY;
+          }
+        }
+      } else if (side == "posX") {
+        if (currentSide == "posX") {
+          movement = this.movementCalculator("up", 3, 3 - currentX, currentX, currentY, currentSide);
+          if (i == 1) {
+            info.dir = 1; info.side = currentSide; info.x = currentX; info.y = currentY;
+          }
+        } else if (currentSide == "posY") {
+          movement = this.movementCalculator("left", currentY, currentX, currentX, currentY, currentSide);
+          if (i == 1) {
+            info.dir = 0; info.side = currentSide; info.x = currentX; info.y = currentY;
+          }
+        } else if (currentSide == "negX") {
+          movement = this.movementCalculator("down", 0, 3 - currentX, currentX, currentY, currentSide);
+          if (i == 1) {
+            info.dir = 1; info.side = currentSide; info.x = currentX; info.y = currentY;
+          }
+        } else if (currentSide == "negY") {
+          movement = this.movementCalculator("right", currentY, currentX, currentX, currentY, currentSide);
+          if (i == 1) {
+            info.dir = 0; info.side = currentSide; info.x = currentX; info.y = currentY;
+          }
+        }
+      } else if (side == "negX") {
+        if (currentSide == "negX") {
+          movement = this.movementCalculator("up", currentY, currentX, currentX, currentY, currentSide);
+          if (i == 1) {
+            info.dir = 1; info.side = currentSide; info.x = currentX; info.y = currentY;
+          }
+        } else if (currentSide == "posY") {
+          movement = this.movementCalculator("right", 3 - currentY, 0, currentX, currentY, currentSide);
+          if (i == 1) {
+            info.dir = 0; info.side = currentSide; info.x = currentX; info.y = currentY;
+          }
+        } else if (currentSide == "posX") {
+          movement = this.movementCalculator("down", 3, currentX, currentX, currentY, currentSide);
+          if (i == 1) {
+            info.dir = 1; info.side = currentSide; info.x = currentX; info.y = currentY;
+          }
+        } else if (currentSide == "negY") {
+          movement = this.movementCalculator("left", 3 - currentY, 3, currentX, currentY, currentSide);
+          if (i == 1) {
+            info.dir = 0; info.side = currentSide; info.x = currentX; info.y = currentY;
+          }
+        }
+      } else if (side == "negZ") {
+        if (currentSide == "negZ") {
+          movement = this.movementCalculator("up", 3 - currentX, 0, currentX, currentY, currentSide);
+          if (i == 1) {
+            info.dir = 1; info.side = currentSide; info.x = currentX; info.y = currentY;
+          }
+        } else if (currentSide == "negY") {
+          movement = this.movementCalculator("down", 3 - currentX, 3, currentX, currentY, currentSide);
+          if (i == 1) {
+            info.dir = 1; info.side = currentSide; info.x = currentX; info.y = currentY;
+          }
+        } else {
+          movement = this.movementCalculator("down", currentX, 0, currentX, currentY, currentSide);
+          if (i == 1) {
+            info.dir = 1; info.side = currentSide; info.x = currentX; info.y = currentY;
+          }
+        }
+      }
+      if (movement) { currentX = movement.x; currentY = movement.y; currentSide = movement.side } else break;
+    }
+    moveableCoords[info.side].push([info.x, info.y])
+    for (var coordinate of this.calcSecondaryMovement(info.dir, info.side, info.x, info.y)) {
+      moveableCoords[coordinate.side].push([coordinate.x, coordinate.y])
+    }
+    info = { dir: null, side: null, x: null, y: null };
+    currentSide = side, currentX = x, currentY = y;
+    for (var i = 0; i < 2; i++) { //down
+      var movement;
+      if (side == "posZ" || side == "posY" || side == "negY") {
+        if (currentSide == "negZ") {
+          movement = this.movementCalculator("up", 3 - currentX, 0, currentX, currentY, currentSide);
+          if (i == 1) {
+            info.dir = 1; info.side = currentSide; info.x = currentX; info.y = currentY;
+          }
+        } else if (currentSide == "negY") {
+          movement = this.movementCalculator("down", 3 - currentX, 3, currentX, currentY, currentSide);
+          if (i == 1) {
+            info.dir = 1; info.side = currentSide; info.x = currentX; info.y = currentY;
+          }
+        } else {
+          movement = this.movementCalculator("down", currentX, 0, currentX, currentY, currentSide);
+          if (i == 1) {
+            info.dir = 1; info.side = currentSide; info.x = currentX; info.y = currentY;
+          }
+        }
+      } else if (side == "posX") {
+        if (currentSide == "posX") {
+          movement = this.movementCalculator("down", 3, currentX, currentX, currentY, currentSide);
+          if (i == 1) {
+            info.dir = 1; info.side = currentSide; info.x = currentX; info.y = currentY;
+          }
+        } else if (currentSide == "negY") {
+          movement = this.movementCalculator("left", 3 - currentY, 3, currentX, currentY, currentSide);
+          if (i == 1) {
+            info.dir = 0; info.side = currentSide; info.x = currentX; info.y = currentY;
+          }
+        } else if (currentSide == "negX") {
+          movement = this.movementCalculator("up", 0, currentX, currentX, currentY, currentSide);
+          if (i == 1) {
+            info.dir = 1; info.side = currentSide; info.x = currentX; info.y = currentY;
+          }
+        } else if (currentSide == "posY") {
+          movement = this.movementCalculator("right", 3 - currentY, 0, currentX, currentY, currentSide);
+          if (i == 1) {
+            info.dir = 0; info.side = currentSide; info.x = currentX; info.y = currentY;
+          }
+        }
+      } else if (side == "negX") {
+        if (currentSide == "negX") {
+          movement = this.movementCalculator("down", 0, 3 - currentX, currentX, currentY, currentSide);
+          if (i == 1) {
+            info.dir = 1; info.side = currentSide; info.x = currentX; info.y = currentY;
+          }
+        } else if (currentSide == "negY") {
+          movement = this.movementCalculator("right", currentY, 3, currentX, currentY, currentSide);
+          if (i == 1) {
+            info.dir = 0; info.side = currentSide; info.x = currentX; info.y = currentY;
+          }
+        } else if (currentSide == "posX") {
+          movement = this.movementCalculator("up", 3, 3 - currentX, currentX, currentY, currentSide);
+          if (i == 1) {
+            info.dir = 1; info.side = currentSide; info.x = currentX; info.y = currentY;
+          }
+        } else if (currentSide == "posY") {
+          movement = this.movementCalculator("left", currentY, 0, currentX, currentY, currentSide);
+          if (i == 1) {
+            info.dir = 0; info.side = currentSide; info.x = currentX; info.y = currentY;
+          }
+        }
+      } else if (side == "negZ") {
+        if (currentSide == "negZ") {
+          movement = this.movementCalculator("down", 3 - currentX, 3, currentX, currentY, currentSide);
+          if (i == 1) {
+            info.dir = 1; info.side = currentSide; info.x = currentX; info.y = currentY;
+          }
+        } else if (currentSide == "posY") {
+          movement = this.movementCalculator("up", 3 - currentX, 0, currentX, currentY, currentSide);
+          if (i == 1) {
+            info.dir = 1; info.side = currentSide; info.x = currentX; info.y = currentY;
+          }
+        } else {
+          movement = this.movementCalculator("up", currentX, 3, currentX, currentY, currentSide);
+          if (i == 1) {
+            info.dir = 1; info.side = currentSide; info.x = currentX; info.y = currentY;
+          }
+        }
+      }
+      if (movement) { currentX = movement.x; currentY = movement.y; currentSide = movement.side } else break;
+    }
+
+    moveableCoords[info.side].push([info.x, info.y])
+    for (var coordinate of this.calcSecondaryMovement(info.dir, info.side, info.x, info.y, board)) {
+      moveableCoords[coordinate.side].push([coordinate.x, coordinate.y])
+    }
+
+    return moveableCoords;
+  }
+
+  calcSecondaryMovement(dir, side, x, y, board) {
+    var moveableCoordsArr = [];
+    var currentSide = side, currentX = x, currentY = y;
+
+    if (dir == 1) {
+      //right
+      var movement;
+      if (side == "posY") {
+        if (currentSide == "posY") {
+          movement = this.movementCalculator("right", 3 - currentY, 0, currentX, currentY, currentSide);
+        } else if (currentSide == "posX") {
+          movement = this.movementCalculator("down", currentY, currentX, currentX, currentY, currentSide);
+        } else if (currentSide == "negY") {
+          movement = this.movementCalculator("left", 3 - currentY, 3 - currentX, currentX, currentY, currentSide);
+        } else if (currentSide == "negX") {
+          movement = this.movementCalculator("up", currentY, currentX, currentX, currentY, currentSide);
+        }
+      } else if (side == "negY") {
+        if (currentSide == "negY") {
+          movement = this.movementCalculator("right", currentY, 3, currentX, currentY, currentSide);
+        } else if (currentSide == "posX") {
+          movement = this.movementCalculator("up", 3 - currentY, 3 - currentX, currentX, currentY, currentSide);
+        } else if (currentSide == "posY") {
+          movement = this.movementCalculator("left", currentY, currentX, currentX, currentY, currentSide);
+        } else if (currentSide == "negX") {
+          movement = this.movementCalculator("down", 3 - currentY, 3 - currentX, currentX, currentY, currentSide);
+        }
+      } else {
+        movement = this.movementCalculator("right", 0, currentY, currentX, currentY, currentSide);
+      }
+      if (movement) { currentX = movement.x; currentY = movement.y; currentSide = movement.side }
+      moveableCoordsArr.push({ side: currentSide, x: currentX, y: currentY })
+
+      //left
+      currentSide = side, currentX = x, currentY = y, movement = null;
+      if (side == "posY") {
+        if (currentSide == "posY") {
+          movement = this.movementCalculator("left", currentY, 0, currentX, currentY, currentSide);
+        } else if (currentSide == "negX") {
+          movement = this.movementCalculator("down", 3 - currentY, 3 - currentX, currentX, currentY, currentSide);
+        } else if (currentSide == "negY") {
+          movement = this.movementCalculator("right", currentY, currentX, currentX, currentY, currentSide);
+        } else if (currentSide == "posX") {
+          movement = this.movementCalculator("up", 3 - currentY, 3 - currentX, currentX, currentY, currentSide);
+        }
+      } else if (side == "negY") {
+        if (currentSide == "negY") {
+          movement = this.movementCalculator("left", 3 - currentY, 3, currentX, currentY, currentSide);
+        } else if (currentSide == "negX") {
+          movement = this.movementCalculator("up", currentY, currentX, currentX, currentY, currentSide);
+        } else if (currentSide == "posY") {
+          movement = this.movementCalculator("right", 3 - currentY, 3 - currentX, currentX, currentY, currentSide);
+        } else if (currentSide == "posX") {
+          movement = this.movementCalculator("down", currentY, currentX, currentX, currentY, currentSide);
+        }
+      } else {
+        movement = this.movementCalculator("left", 3, currentY, currentX, currentY, currentSide);
+      }
+      if (movement) { currentX = movement.x; currentY = movement.y; currentSide = movement.side }
+      moveableCoordsArr.push({ side: currentSide, x: currentX, y: currentY })
+    } else if (dir == 0) {
+      //up
+      var movement;
+      if (side == "posZ" || side == "posY" || side == "negY") {
+        if (currentSide == "negZ") {
+          movement = this.movementCalculator("down", 3 - currentX, 3, currentX, currentY, currentSide);
+        } else if (currentSide == "posY") {
+          movement = this.movementCalculator("up", 3 - currentX, 0, currentX, currentY, currentSide);
+        } else {
+          movement = this.movementCalculator("up", currentX, 3, currentX, currentY, currentSide);
+        }
+      } else if (side == "posX") {
+        if (currentSide == "posX") {
+          movement = this.movementCalculator("up", 3, 3 - currentX, currentX, currentY, currentSide);
+        } else if (currentSide == "posY") {
+          movement = this.movementCalculator("left", currentY, currentX, currentX, currentY, currentSide);
+        } else if (currentSide == "negX") {
+          movement = this.movementCalculator("down", 0, 3 - currentX, currentX, currentY, currentSide);
+        } else if (currentSide == "negY") {
+          movement = this.movementCalculator("right", currentY, currentX, currentX, currentY, currentSide);
+        }
+      } else if (side == "negX") {
+        if (currentSide == "negX") {
+          movement = this.movementCalculator("up", currentY, currentX, currentX, currentY, currentSide);
+        } else if (currentSide == "posY") {
+          movement = this.movementCalculator("right", 3 - currentY, 0, currentX, currentY, currentSide);
+        } else if (currentSide == "posX") {
+          movement = this.movementCalculator("down", 3, currentX, currentX, currentY, currentSide);
+        } else if (currentSide == "negY") {
+          movement = this.movementCalculator("left", 3 - currentY, 3, currentX, currentY, currentSide);
+        }
+      } else if (side == "negZ") {
+        if (currentSide == "negZ") {
+          movement = this.movementCalculator("up", 3 - currentX, 0, currentX, currentY, currentSide);
+        } else if (currentSide == "negY") {
+          movement = this.movementCalculator("down", 3 - currentX, 3, currentX, currentY, currentSide);
+        } else {
+          movement = this.movementCalculator("down", currentX, 0, currentX, currentY, currentSide);
+        }
+      }
+      if (movement) { currentX = movement.x; currentY = movement.y; currentSide = movement.side }
+      moveableCoordsArr.push({ side: currentSide, x: currentX, y: currentY })
+
+      //down
+      currentSide = side, currentX = x, currentY = y, movement = null;
+      if (side == "posZ" || side == "posY" || side == "negY") {
+        if (currentSide == "negZ") {
+          movement = this.movementCalculator("up", 3 - currentX, 0, currentX, currentY, currentSide);
+        } else if (currentSide == "negY") {
+          movement = this.movementCalculator("down", 3 - currentX, 3, currentX, currentY, currentSide);
+        } else {
+          movement = this.movementCalculator("down", currentX, 0, currentX, currentY, currentSide);
+        }
+      } else if (side == "posX") {
+        if (currentSide == "posX") {
+          movement = this.movementCalculator("down", 3, currentX, currentX, currentY, currentSide);
+        } else if (currentSide == "negY") {
+          movement = this.movementCalculator("left", 3 - currentY, 3, currentX, currentY, currentSide);
+        } else if (currentSide == "negX") {
+          movement = this.movementCalculator("up", 0, currentX, currentX, currentY, currentSide);
+        } else if (currentSide == "posY") {
+          movement = this.movementCalculator("right", 3 - currentY, 0, currentX, currentY, currentSide);
+        }
+      } else if (side == "negX") {
+        if (currentSide == "negX") {
+          movement = this.movementCalculator("down", 0, 3 - currentX, currentX, currentY, currentSide);
+        } else if (currentSide == "negY") {
+          movement = this.movementCalculator("right", currentY, 3, currentX, currentY, currentSide);
+        } else if (currentSide == "posX") {
+          movement = this.movementCalculator("up", 3, 3 - currentX, currentX, currentY, currentSide);
+        } else if (currentSide == "posY") {
+          movement = this.movementCalculator("left", currentY, 0, currentX, currentY, currentSide);
+        }
+      } else if (side == "negZ") {
+        if (currentSide == "negZ") {
+          movement = this.movementCalculator("down", 3 - currentX, 3, currentX, currentY, currentSide);
+        } else if (currentSide == "posY") {
+          movement = this.movementCalculator("up", 3 - currentX, 0, currentX, currentY, currentSide);
+        } else {
+          movement = this.movementCalculator("up", currentX, 3, currentX, currentY, currentSide);
+        }
+      }
+      if (movement) { currentX = movement.x; currentY = movement.y; currentSide = movement.side }
+      moveableCoordsArr.push({ side: currentSide, x: currentX, y: currentY })
+    }
+
+    return moveableCoordsArr;
+  }
+}
+
 export class Knight extends Piece {
   constructor(color) {
     super(color)
@@ -801,10 +1312,11 @@ export class Knight extends Piece {
           }
         }
       }
-      for (var coordinate of this.calcSecondaryMovement(info.dir, info.side, info.x, info.y, board)) {
-        moveableCoords[coordinate.side].push([coordinate.x, coordinate.y])
-      }
       if (movement) { currentX = movement.x; currentY = movement.y; currentSide = movement.side } else break;
+    }
+
+    for (var coordinate of this.calcSecondaryMovement(info.dir, info.side, info.x, info.y, board)) {
+      moveableCoords[coordinate.side].push([coordinate.x, coordinate.y])
     }
 
     return moveableCoords;

@@ -58,7 +58,7 @@ export default class App extends React.Component {
       negY: [[null, null, null, null], [null, null, null, null], [null, null, null, null], [null, null, null, null]],
       posX: [[null, null, null, null], [null, null, null, null], [null, null, new P.Rook(P.WHITE), null], [null, null, null, null]],
       negX: [[null, null, null, null], [null, new P.Queen(P.WHITE), new P.Queen(P.WHITE), null], [null, null, null, null], [null, null, null, null]],
-      posZ: [[null, null, null, null], [null, null, null, null], [null, new P.Knight(P.BLACK), null, null], [null, null, null, null]],
+      posZ: [[null, null, null, null], [null, null, null, null], [null, new P.Knight(P.BLACK), null, new P.King(P.BLACK)], [null, null, null, null]],
       negZ: [[null, null, null, null], [null, null, null, null], [new P.Bishop(P.BLACK), null, null, null], [null, null, null, null]]
     };
 
@@ -125,6 +125,8 @@ export default class App extends React.Component {
               this.addPiece("knight", side, i, j, color);
             } else if (this.board[side][i][j] instanceof P.Rook) {
               this.addPiece("rook", side, i, j, color);
+            } else if (this.board[side][i][j] instanceof P.King) {
+              this.addPiece("king", side, i, j, color);
             }
           }
         }
