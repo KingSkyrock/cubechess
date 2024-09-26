@@ -1,1 +1,1 @@
-# super-chess-battle
+# Chess on a cube!
